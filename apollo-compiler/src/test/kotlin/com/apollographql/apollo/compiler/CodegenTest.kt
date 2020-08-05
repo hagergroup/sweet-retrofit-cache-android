@@ -164,9 +164,9 @@ class CodeGenTest(private val folder: File) {
       val schema = IntrospectionSchema(schemaJson)
       val graphQLFile = File(folder, "TestOperation.graphql")
 
-      val packageNameProvider = DefaultPackageNameProvider(
+      val packageNameProvider = DefaultPackageNameProvider.of(
           rootFolders = listOf(folder),
-          schemaFile = schemaJson,
+          schemaPackageName = "",
           rootPackageName = "com.example.${folder.name}"
       )
 
@@ -188,7 +188,7 @@ class CodeGenTest(private val folder: File) {
         else -> emptyList()
       }
 
-      val ir = GraphQLDocumentParser(schema, packageNameProvider).parse(setOf(graphQLFile))
+      val ir = GraphQLDocumentParser(schema, packageNameProvider, exportAllTypes = false).parse(setOf(graphQLFile))
 
       val operationOutput = ir.operations.map {
         operationIdGenerator.apply(QueryDocumentMinifier.minify(it.sourceWithFragments), it.filePath) to OperationDescriptor(
@@ -214,7 +214,8 @@ class CodeGenTest(private val folder: File) {
           generateVisitorForPolymorphicDatatypes = generateVisitorForPolymorphicDatatypes,
           generateAsInternal = generateAsInternal,
           kotlinMultiPlatformProject = true,
-          enumAsSealedClassPatternFilters = enumAsSealedClassPatternFilters
+          enumAsSealedClassPatternFilters = enumAsSealedClassPatternFilters,
+          writeTypes = true
       )
     }
 
