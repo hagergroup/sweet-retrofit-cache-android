@@ -17,7 +17,7 @@ def versions = [
     mockito               : '1.9.5',
     moshi                 : '1.9.2',
     okHttp4               : '4.5.0',
-    okHttp                : '3.12.11',
+    okHttp                : '3.14.9',
     okio                  : '2.8.0',
     rxjava                : '2.0.5',
     rxjava3               : '3.0.4',
@@ -95,6 +95,8 @@ ext.dep = [
     ],
     truth                 : "com.google.truth:truth:$versions.truth",
     uuid                  : "com.benasher44:uuid:0.2.0",
+    retrofit              : "com.squareup.retrofit2:retrofit:2.9.0",
+    timber                : "com.jakewharton.timber:timber:4.7.1",
 ]
 ext.androidConfig = [
     compileSdkVersion: 28,
