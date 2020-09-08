@@ -33,6 +33,12 @@ object HttpCachePolicy {
   val NETWORK_FIRST = ExpirePolicy(FetchStrategy.NETWORK_FIRST)
 
   /**
+   * Signals the apollo client to delete the http cache.
+   */
+  @JvmField
+  val DELETE = ExpirePolicy(FetchStrategy.DELETE)
+
+  /**
    * Abstraction for http cache policy configurations
    */
   open class Policy(
@@ -103,6 +109,11 @@ object HttpCachePolicy {
      * Signals the apollo client to first fetch the GraphQL query response from the network. If it fails then fetch the
      * response from the http cache.
      */
-    NETWORK_FIRST
+    NETWORK_FIRST,
+
+    /**
+     * Signals the apollo client to delete the http cache.
+     */
+    DELETE
   }
 }

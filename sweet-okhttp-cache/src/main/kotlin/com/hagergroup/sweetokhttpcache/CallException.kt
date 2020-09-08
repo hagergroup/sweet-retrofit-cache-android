@@ -20,38 +20,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package com.hagergroup.sweetretrofitcache
-
-import com.apollographql.apollo.api.cache.http.HttpCachePolicy
-import com.hagergroup.sweetretrofitcache.request.decorateRequest
-import okhttp3.Interceptor
-import okhttp3.Response
+package com.hagergroup.sweetokhttpcache
 
 /**
+ * The exception that will be thrown if any problem occurs during a web service call.
+ *
  * @author Ludovic Roland
- * @since 2020.08.20
+ * @since 2018.03.27
  */
-class RetrofitCacheInterceptor(private val cachePolicies: Map<String, HttpCachePolicy.Policy>) : Interceptor {
+class CallException
+  : Exception
+{
 
-  companion object {
+  val code: Int
 
-    const val CACHE_POLICY_ID = "CachePolicyId"
+  constructor() : this(0)
 
-  }
+  constructor(code: Int) : this(null, null, code)
 
-  override fun intercept(chain: Interceptor.Chain): Response {
-    var request = chain.request()
-    val cachePolicyId = request.header(CACHE_POLICY_ID)
+  constructor(message: String, cause: Throwable) : this(message, cause, 0)
 
-    if (cachePolicyId != null) {
-      val cachePolicy = cachePolicies[cachePolicyId]
+  constructor(message: String) : this(message, 0)
 
-      if (cachePolicy != null) {
-        request = request.decorateRequest(cachePolicy)
-      }
-    }
+  constructor(message: String, code: Int) : this(message, null, code)
 
-    return chain.proceed(request)
+  constructor(cause: Throwable) : this(cause, 0)
+
+  constructor(cause: Throwable, code: Int) : this(null, cause, code)
+
+  constructor(message: String?, cause: Throwable?, code: Int) : super(message, cause)
+  {
+    this.code = code
   }
 
 }

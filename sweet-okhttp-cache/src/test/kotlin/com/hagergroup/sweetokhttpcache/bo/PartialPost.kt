@@ -20,37 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package com.hagergroup.sweetretrofitcache
+package com.hagergroup.sweetokhttpcache.bo
+
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+import java.io.Serializable
 
 /**
- * The exception that will be thrown if any problem occurs during a web service call.
- *
  * @author Ludovic Roland
- * @since 2018.03.27
+ * @since 2020.09.08
  */
-class CallException
-  : Exception
-{
-
-  val code: Int
-
-  constructor() : this(0)
-
-  constructor(code: Int) : this(null, null, code)
-
-  constructor(message: String, cause: Throwable) : this(message, cause, 0)
-
-  constructor(message: String) : this(message, 0)
-
-  constructor(message: String, code: Int) : this(message, null, code)
-
-  constructor(cause: Throwable) : this(cause, 0)
-
-  constructor(cause: Throwable, code: Int) : this(null, cause, code)
-
-  constructor(message: String?, cause: Throwable?, code: Int) : super(message, cause)
-  {
-    this.code = code
-  }
-
-}
+@JsonClass(generateAdapter = true)
+data class PartialPost(@Json(name = "title") val title: String)
+  : Serializable

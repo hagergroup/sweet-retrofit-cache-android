@@ -17,4 +17,4 @@ include("apollo-idling-resource")
 include("apollo-normalized-cache-sqlite")
 include("apollo-android-support")
 
-include("sweet-retrofit-cache")
+include("sweet-okhttp-cache")
