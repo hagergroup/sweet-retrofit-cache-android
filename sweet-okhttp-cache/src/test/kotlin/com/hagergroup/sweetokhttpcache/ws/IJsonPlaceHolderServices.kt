@@ -26,8 +26,10 @@ import com.apollographql.apollo.api.cache.http.HttpCachePolicy
 import com.hagergroup.sweetokhttpcache.SweetCacheInterceptor
 import com.hagergroup.sweetokhttpcache.bo.Post
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.POST
 import retrofit2.http.Path
 import java.util.concurrent.TimeUnit
 
@@ -58,11 +60,11 @@ interface IJsonPlaceHolderServices {
   @GET("posts/{postId}")
   suspend fun getPostWithIdCachePolicy(@Header(SweetCacheInterceptor.CACHE_POLICY_ID) cacheId: String, @Path("postId") postId: Int): Response<Post?>
 
-//  @POST("posts")
-//  fun createPostNoCache(@Body post: Post): Response<Post?>
-//
-//  @POST("posts")
-//  fun createPostCachePolicy(@Body post: Post): Call<Post?>
+  @POST("posts")
+  suspend fun createPostNoCache(@Body post: Post): Response<Post?>
+
+  @POST("posts")
+  suspend fun createPostCachePolicy(@Header(SweetCacheInterceptor.CACHE_POLICY_ID) cacheId: String, @Body post: Post): Response<Post?>
 
 //  @PUT("posts/{postId}")
 //  fun updatePostWithPut(@Path("postId") postId: Int, @Body post: Post): Call<Post?>

@@ -67,7 +67,7 @@ class SweetCacheInterceptorGetTest {
   }
    */
   @Test
-  fun getPostWithIdNetworkFirst() = runBlocking {
+  fun getPostWithIdNetworkFirstTest() = runBlocking {
     val post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(IJsonPlaceHolderServices.CachePolicies.NetworkFirst.name, 2)
 
     Assert.assertNotNull(post)
@@ -85,7 +85,7 @@ class SweetCacheInterceptorGetTest {
   }
    */
   @Test
-  fun getPostWithIdNetworkOnly() = runBlocking {
+  fun getPostWithIdNetworkOnlyTest() = runBlocking {
     val post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(IJsonPlaceHolderServices.CachePolicies.NetworkOnly.name, 3)
 
     Assert.assertNotNull(post)
@@ -103,7 +103,7 @@ class SweetCacheInterceptorGetTest {
   }
    */
   @Test
-  fun getPostWithIdCacheOnly() = runBlocking {
+  fun getPostWithIdCacheOnlyTest() = runBlocking {
     val post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(IJsonPlaceHolderServices.CachePolicies.NetworkOnly.name, 4)
 
     Assert.assertNotNull(post)
@@ -128,7 +128,7 @@ class SweetCacheInterceptorGetTest {
   }
    */
   @Test
-  fun getPostWithIdCacheFirst() = runBlocking {
+  fun getPostWithIdCacheFirstTest() = runBlocking {
     val post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(IJsonPlaceHolderServices.CachePolicies.CacheFirst5Minutes.name, 5)
 
     Assert.assertNotNull(post)
@@ -146,9 +146,11 @@ class SweetCacheInterceptorGetTest {
   }
    */
   @Test
-  fun getPostWithIdCacheOnlyError(): Unit = runBlocking {
+  fun getPostWithIdCacheOnlyErrorTest(): Unit = runBlocking {
     try {
       JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(IJsonPlaceHolderServices.CachePolicies.CacheOnly.name, 6)
+
+      Assert.assertTrue(false)
     } catch (exception: Exception) {
       Assert.assertTrue(exception is CallException)
     }

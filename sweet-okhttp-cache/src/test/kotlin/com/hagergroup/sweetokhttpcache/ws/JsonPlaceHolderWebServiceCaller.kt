@@ -87,44 +87,27 @@ object JsonPlaceHolderWebServiceCaller {
 
   //end region
 
-//  //region get
-//  fun getPost(postId: Int): Post? =
-//      services.getPost(postId).execute().body()
-//
-//  fun getPostWithCacheOnly(postId: Int): Post? {
-//    val inputStream = retrofit.executeWithCachePolicy(HttpCachePolicy.cacheOnly, services.getPost(postId).request())
-//    return gson.fromJson(InputStreamReader(inputStream), Post::class.java)
-//  }
-//
-//  private val postStreamParser by lazy {
-//    object : UriStreamParser<Post?>() {
-//
-//      override fun parse(inputStream: InputStream): Post? =
-//          gson.fromJson(InputStreamReader(inputStream), Post::class.java)
-//
-//    }
-//  }
-//
-//  fun getPostWithCache(postId: Int): Post? =
-//      retrofit.executeWithCachePolicy(HttpCachePolicy.cacheFirst.expireAfter(1, TimeUnit.HOURS), services.getPost(postId).request(), postStreamParser)
-//
-//  fun getPostNetworkFirst(postId: Int): Post? =
-//      retrofit.executeWithCachePolicy(HttpCachePolicy.networkFirst.expireAfter(1, TimeUnit.HOURS), services.getPost(postId).request(), postStreamParser)
-//
-//  fun getPostInfoValueCacheOnly(postId: Int): InfoValue<Post?> =
-//      retrofit.getInfoValueWithCachePolicy(HttpCachePolicy.cacheOnly, services.getPost(postId).request(), postStreamParser)
-//
-//
-//  fun deleteCache(postId: Int) {
-//    retrofit.deleteCache(services.getPost(postId).request())
-//  }
-//
-//  //endregion
-//
-//  //region post
-//  fun createPost(post: Post): Post? =
-//      services.createPost(post).execute().body()
-//
+  //region post
+  suspend fun createPost(post: Post): Post? {
+    val response = services.createPostNoCache(post)
+
+    if (response.isSuccessful == false) {
+      throw CallException(response.message(), response.code())
+    }
+
+    return response.body()
+  }
+
+  suspend fun createPostCachePolicy(cachePolicyName: String, post: Post): Post? {
+    val response = services.createPostCachePolicy(cachePolicyName, post)
+
+    if (response.isSuccessful == false) {
+      throw CallException(response.message(), response.code())
+    }
+
+    return response.body()
+  }
+
 //  fun createPostWithCacheOnly(post: Post): Post? {
 //    val inputStream = retrofit.executeWithCachePolicy(HttpCachePolicy.cacheOnly, services.createPost(post).request())
 //    return gson.fromJson(InputStreamReader(inputStream), Post::class.java)
@@ -139,9 +122,9 @@ object JsonPlaceHolderWebServiceCaller {
 //    val infoValue = retrofit.getInfoValueWithCachePolicy(HttpCachePolicy.cacheOnly, services.createPost(post).request())
 //    return Pair(gson.fromJson(InputStreamReader(infoValue.value), Post::class.java), infoValue.date)
 //  }
-//
-//  //endregion
-//
+
+  //endregion
+
 //  //region put
 //  fun updatePostWithPut(postId: Int, post: Post): Post? =
 //      services.updatePostWithPut(postId, post).execute().body()
