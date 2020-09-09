@@ -10,4 +10,4 @@ git reset --hard {tag commit id}
 git push --force
 git push --tags
 
-then merge the master branch to the retrofit-cache one
+then merge the master branch into the okhttp-cache one
