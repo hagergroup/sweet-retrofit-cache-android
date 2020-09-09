@@ -24,12 +24,15 @@ package com.hagergroup.sweetokhttpcache.ws
 
 import com.apollographql.apollo.api.cache.http.HttpCachePolicy
 import com.hagergroup.sweetokhttpcache.SweetCacheInterceptor
+import com.hagergroup.sweetokhttpcache.bo.PartialPost
 import com.hagergroup.sweetokhttpcache.bo.Post
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import java.util.concurrent.TimeUnit
 
@@ -37,7 +40,7 @@ import java.util.concurrent.TimeUnit
  * @author Ludovic Roland
  * @since 2020.09.08
  */
-interface IJsonPlaceHolderServices {
+interface JsonPlaceHolderServices {
 
   enum class CachePolicies(val policy: HttpCachePolicy.Policy) {
 
@@ -66,12 +69,19 @@ interface IJsonPlaceHolderServices {
   @POST("posts")
   suspend fun createPostCachePolicy(@Header(SweetCacheInterceptor.CACHE_POLICY_ID) cacheId: String, @Body post: Post): Response<Post?>
 
-//  @PUT("posts/{postId}")
-//  fun updatePostWithPut(@Path("postId") postId: Int, @Body post: Post): Call<Post?>
-//
-//  @PATCH("posts/{postId}")
-//  fun updatePostWithPatch(@Path("postId") postId: Int, @Body partialPost: PartialPost): Call<Post?>
-//
+  @PUT("posts/{postId}")
+  suspend fun updatePostPutNoCache(@Path("postId") postId: Int, @Body post: Post): Response<Post?>
+
+  @PUT("posts/{postId}")
+  suspend fun updatePostPutCachePolicy(@Header(SweetCacheInterceptor.CACHE_POLICY_ID) cacheId: String, @Path("postId") postId: Int, @Body post: Post): Response<Post?>
+
+  @PATCH("posts/{postId}")
+  suspend fun updatePostPatchNoCache(@Path("postId") postId: Int, @Body partialPost: PartialPost): Response<Post?>
+
+  @PATCH("posts/{postId}")
+  suspend fun updatePostPatchCachePolicy(@Header(SweetCacheInterceptor.CACHE_POLICY_ID) cacheId: String, @Path("postId") postId: Int, @Body partialPost: PartialPost): Response<Post?>
+
+
 //  @DELETE("posts/{postId}")
 //  fun deletePost(@Path("postId") postId: Int): Call<ResponseBody>
 

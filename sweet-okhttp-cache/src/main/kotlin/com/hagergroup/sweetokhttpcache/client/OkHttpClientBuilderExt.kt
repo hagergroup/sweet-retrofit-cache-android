@@ -35,9 +35,9 @@ import java.io.IOException
  * @since 2020.09.08
  */
 @Throws(IOException::class)
-fun OkHttpClient.Builder.addSweetHttpCache(cachePolicies: Map<String, HttpCachePolicy.Policy>, directory: File): OkHttpClient.Builder {
+fun OkHttpClient.Builder.addSweetHttpCache(cachePolicies: Map<String, HttpCachePolicy.Policy>, directory: File, cacheSize: Long = 1024 * 1024): OkHttpClient.Builder {
   addInterceptor(SweetCacheInterceptor(cachePolicies))
-  addInterceptor(ApolloHttpCache(DiskLruHttpCacheStore(directory, 1024 * 1024)).interceptor())
+  addInterceptor(ApolloHttpCache(DiskLruHttpCacheStore(directory, cacheSize)).interceptor())
 
   return this
 }

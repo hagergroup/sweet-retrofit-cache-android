@@ -35,86 +35,86 @@ import org.robolectric.annotation.Config
 
 /**
  * @author Ludovic Roland
- * @since 2020.09.08
+ * @since 2020.09.09
  */
 @RunWith(AndroidJUnit4::class)
 @Config(application = Application::class)
-class SweetCacheInterceptorPostTest {
+class SweetCacheInterceptorPutTest {
 
   @Test
-  fun createPostNoCacheTest() = runBlocking {
-    val originalPost = Post(userId = 1, title = "title1", body = "body1")
-    val responsePost = JsonPlaceHolderWebServiceCaller.createPost(originalPost)
+  fun updatePostNoCacheTest() = runBlocking {
+    val originalPost = Post(id = 1, userId = 1, title = "title1", body = "body1")
+    val responsePost = JsonPlaceHolderWebServiceCaller.updatePostPut(originalPost)
 
     Assert.assertNotNull(responsePost)
-    Assert.assertEquals(responsePost?.id, 101)
+    Assert.assertEquals(responsePost?.id, originalPost.id)
     Assert.assertEquals(responsePost?.userId, originalPost.userId)
     Assert.assertEquals(responsePost?.title, originalPost.title)
     Assert.assertEquals(responsePost?.body, originalPost.body)
   }
 
   @Test
-  fun createPostNetworkFirstTest() = runBlocking {
-    val originalPost = Post(userId = 2, title = "title2", body = "body2")
-    val responsePost = JsonPlaceHolderWebServiceCaller.createPostCachePolicy(JsonPlaceHolderServices.CachePolicies.NetworkFirst.name, originalPost)
+  fun updatePostNetworkFirstTest() = runBlocking {
+    val originalPost = Post(id = 2, userId = 2, title = "title2", body = "body2")
+    val responsePost = JsonPlaceHolderWebServiceCaller.updatePostPutCachePolicy(JsonPlaceHolderServices.CachePolicies.NetworkFirst.name, originalPost)
 
     Assert.assertNotNull(responsePost)
-    Assert.assertEquals(responsePost?.id, 101)
+    Assert.assertEquals(responsePost?.id, originalPost.id)
     Assert.assertEquals(responsePost?.userId, originalPost.userId)
     Assert.assertEquals(responsePost?.title, originalPost.title)
     Assert.assertEquals(responsePost?.body, originalPost.body)
   }
 
   @Test
-  fun createPostNetworkOnlyTest() = runBlocking {
-    val originalPost = Post(userId = 3, title = "title3", body = "body3")
-    val responsePost = JsonPlaceHolderWebServiceCaller.createPostCachePolicy(JsonPlaceHolderServices.CachePolicies.NetworkOnly.name, originalPost)
+  fun updatePostNetworkOnlyTest() = runBlocking {
+    val originalPost = Post(id = 3, userId = 3, title = "title3", body = "body3")
+    val responsePost = JsonPlaceHolderWebServiceCaller.updatePostPutCachePolicy(JsonPlaceHolderServices.CachePolicies.NetworkOnly.name, originalPost)
 
     Assert.assertNotNull(responsePost)
-    Assert.assertEquals(responsePost?.id, 101)
+    Assert.assertEquals(responsePost?.id, originalPost.id)
     Assert.assertEquals(responsePost?.userId, originalPost.userId)
     Assert.assertEquals(responsePost?.title, originalPost.title)
     Assert.assertEquals(responsePost?.body, originalPost.body)
   }
 
   @Test
-  fun createPostCacheOnlyTest() = runBlocking {
-    val originalPost = Post(userId = 4, title = "title4", body = "body4")
+  fun updatePostCacheOnlyTest() = runBlocking {
+    val originalPost = Post(id = 4, userId = 4, title = "title4", body = "body4")
 
-    val responsePost = JsonPlaceHolderWebServiceCaller.createPostCachePolicy(JsonPlaceHolderServices.CachePolicies.NetworkOnly.name, originalPost)
+    val responsePost = JsonPlaceHolderWebServiceCaller.updatePostPutCachePolicy(JsonPlaceHolderServices.CachePolicies.NetworkOnly.name, originalPost)
 
     Assert.assertNotNull(responsePost)
-    Assert.assertEquals(responsePost?.id, 101)
+    Assert.assertEquals(responsePost?.id, originalPost.id)
     Assert.assertEquals(responsePost?.userId, originalPost.userId)
     Assert.assertEquals(responsePost?.title, originalPost.title)
     Assert.assertEquals(responsePost?.body, originalPost.body)
 
-    val otherPost = JsonPlaceHolderWebServiceCaller.createPostCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheOnly.name, originalPost)
+    val otherPost = JsonPlaceHolderWebServiceCaller.updatePostPutCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheOnly.name, originalPost)
 
     Assert.assertNotNull(otherPost)
-    Assert.assertEquals(otherPost?.id, 101)
+    Assert.assertEquals(otherPost?.id, originalPost.id)
     Assert.assertEquals(otherPost?.userId, originalPost.userId)
     Assert.assertEquals(otherPost?.title, originalPost.title)
     Assert.assertEquals(otherPost?.body, originalPost.body)
   }
 
   @Test
-  fun createPostCacheFirstTest() = runBlocking {
-    val originalPost = Post(userId = 5, title = "title5", body = "body5")
-    val responsePost = JsonPlaceHolderWebServiceCaller.createPostCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheFirst5Minutes.name, originalPost)
+  fun updatePostCacheFirstTest() = runBlocking {
+    val originalPost = Post(id = 5, userId = 5, title = "title5", body = "body5")
+    val responsePost = JsonPlaceHolderWebServiceCaller.updatePostPutCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheFirst5Minutes.name, originalPost)
 
     Assert.assertNotNull(responsePost)
-    Assert.assertEquals(responsePost?.id, 101)
+    Assert.assertEquals(responsePost?.id, originalPost.id)
     Assert.assertEquals(responsePost?.userId, originalPost.userId)
     Assert.assertEquals(responsePost?.title, originalPost.title)
     Assert.assertEquals(responsePost?.body, originalPost.body)
   }
 
   @Test
-  fun createPostCacheOnlyErrorTest(): Unit = runBlocking {
+  fun updatePostCacheOnlyErrorTest(): Unit = runBlocking {
     try {
-      val originalPost = Post(userId = 6, title = "title6", body = "body6")
-      JsonPlaceHolderWebServiceCaller.createPostCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheOnly.name, originalPost)
+      val originalPost = Post(id = 6, userId = 6, title = "title6", body = "body6")
+      JsonPlaceHolderWebServiceCaller.updatePostPutCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheOnly.name, originalPost)
 
       Assert.assertTrue(false)
     } catch (exception: Exception) {

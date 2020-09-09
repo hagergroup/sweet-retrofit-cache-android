@@ -24,6 +24,7 @@ package com.hagergroup.sweetokhttpcache.ws
 
 import android.os.Environment
 import com.hagergroup.sweetokhttpcache.CallException
+import com.hagergroup.sweetokhttpcache.bo.PartialPost
 import com.hagergroup.sweetokhttpcache.bo.Post
 import com.hagergroup.sweetokhttpcache.client.addSweetHttpCache
 import okhttp3.Interceptor
@@ -39,13 +40,13 @@ import java.util.concurrent.TimeUnit
  */
 object JsonPlaceHolderWebServiceCaller {
 
-  private val services: IJsonPlaceHolderServices
+  private val services: JsonPlaceHolderServices
 
   init {
     val okHttp = OkHttpClient.Builder().apply {
       readTimeout(10, TimeUnit.SECONDS)
       connectTimeout(10, TimeUnit.SECONDS)
-      addSweetHttpCache(IJsonPlaceHolderServices.CachePolicies.toMap(), Environment.getDownloadCacheDirectory())
+      addSweetHttpCache(JsonPlaceHolderServices.CachePolicies.toMap(), Environment.getDownloadCacheDirectory())
       addNetworkInterceptor(httpLoggingInterceptor())
     }.build()
 
@@ -55,7 +56,7 @@ object JsonPlaceHolderWebServiceCaller {
       client(okHttp)
     }
 
-    services = retrofitBuilder.build().create(IJsonPlaceHolderServices::class.java)
+    services = retrofitBuilder.build().create(JsonPlaceHolderServices::class.java)
   }
 
   private fun httpLoggingInterceptor(): Interceptor {
@@ -84,7 +85,6 @@ object JsonPlaceHolderWebServiceCaller {
 
     return response.body()
   }
-
   //end region
 
   //region post
@@ -107,64 +107,56 @@ object JsonPlaceHolderWebServiceCaller {
 
     return response.body()
   }
-
-//  fun createPostWithCacheOnly(post: Post): Post? {
-//    val inputStream = retrofit.executeWithCachePolicy(HttpCachePolicy.cacheOnly, services.createPost(post).request())
-//    return gson.fromJson(InputStreamReader(inputStream), Post::class.java)
-//  }
-//
-//  fun createPostWithCache(post: Post): Post? {
-//    val inputStream = retrofit.executeWithCachePolicy(HttpCachePolicy.cacheFirst.expireAfter(10, TimeUnit.SECONDS), services.createPost(post).request())
-//    return gson.fromJson(InputStreamReader(inputStream), Post::class.java)
-//  }
-//
-//  fun createPostInfoValueWithCacheOnly(post: Post): Pair<Post, String?> {
-//    val infoValue = retrofit.getInfoValueWithCachePolicy(HttpCachePolicy.cacheOnly, services.createPost(post).request())
-//    return Pair(gson.fromJson(InputStreamReader(infoValue.value), Post::class.java), infoValue.date)
-//  }
-
   //endregion
 
-//  //region put
-//  fun updatePostWithPut(postId: Int, post: Post): Post? =
-//      services.updatePostWithPut(postId, post).execute().body()
-//
-//  fun updatePostWithPutWithCacheOnly(postId: Int, post: Post): Post? {
-//    val inputStream = retrofit.executeWithCachePolicy(HttpCachePolicy.cacheOnly, services.updatePostWithPut(postId, post).request())
-//    return gson.fromJson(InputStreamReader(inputStream), Post::class.java)
-//  }
-//
-//  fun updatePostWithPutWithCache(postId: Int, post: Post): Post? {
-//    val inputStream = retrofit.executeWithCachePolicy(HttpCachePolicy.cacheFirst.expireAfter(10, TimeUnit.SECONDS), services.updatePostWithPut(postId, post).request())
-//    return gson.fromJson(InputStreamReader(inputStream), Post::class.java)
-//  }
-//
-//  fun updatePostInfoValueWithCacheOnly(postId: Int, post: Post): Pair<Post, String?> {
-//    val infoValue = retrofit.getInfoValueWithCachePolicy(HttpCachePolicy.cacheOnly, services.updatePostWithPut(postId, post).request())
-//    return Pair(gson.fromJson(InputStreamReader(infoValue.value), Post::class.java), infoValue.date)
-//  }
-//  //endregion
-//
-//  //region patch
-//  fun updatePostWithPatch(postId: Int, partialPost: PartialPost): Post? =
-//      services.updatePostWithPatch(postId, partialPost).execute().body()
-//
-//  fun updatePostWithPatchWithCacheOnly(postId: Int, partialPost: PartialPost): Post? {
-//    val inputStream = retrofit.executeWithCachePolicy(HttpCachePolicy.cacheOnly, services.updatePostWithPatch(postId, partialPost).request())
-//    return gson.fromJson(InputStreamReader(inputStream), Post::class.java)
-//  }
-//
-//  fun updatePostWithPatchWithCache(postId: Int, partialPost: PartialPost): Post? {
-//    val inputStream = retrofit.executeWithCachePolicy(HttpCachePolicy.cacheFirst.expireAfter(10, TimeUnit.SECONDS), services.updatePostWithPatch(postId, partialPost).request())
-//    return gson.fromJson(InputStreamReader(inputStream), Post::class.java)
-//  }
-//
-//  fun updatePostInfoValueWithPatchWithCacheOnly(postId: Int, partialPost: PartialPost): Pair<Post, String?> {
-//    val infoValue = retrofit.getInfoValueWithCachePolicy(HttpCachePolicy.cacheOnly, services.updatePostWithPatch(postId, partialPost).request())
-//    return Pair(gson.fromJson(InputStreamReader(infoValue.value), Post::class.java), infoValue.date)
-//  }
-//  //endregion
-//
+  //region put
+  suspend fun updatePostPut(post: Post): Post? {
+    requireNotNull(post.id) { "the id of the post cannot be null" }
+
+    val response = services.updatePostPutNoCache(post.id, post)
+
+    if (response.isSuccessful == false) {
+      throw CallException(response.message(), response.code())
+    }
+
+    return response.body()
+  }
+
+  suspend fun updatePostPutCachePolicy(cachePolicyName: String, post: Post): Post? {
+    requireNotNull(post.id) { "the id of the post cannot be null" }
+
+    val response = services.updatePostPutCachePolicy(cachePolicyName, post.id, post)
+
+    if (response.isSuccessful == false) {
+      throw CallException(response.message(), response.code())
+    }
+
+    return response.body()
+  }
+  //endregion
+
+  //region patch
+  suspend fun updatePostPatch(postId: Int, partialPost: PartialPost): Post? {
+    val response = services.updatePostPatchNoCache(postId, partialPost)
+
+    if (response.isSuccessful == false) {
+      throw CallException(response.message(), response.code())
+    }
+
+    return response.body()
+  }
+
+  suspend fun updatePostPatchCachePolicy(cachePolicyName: String, postId: Int, partialPost: PartialPost): Post? {
+    val response = services.updatePostPatchCachePolicy(cachePolicyName, postId, partialPost)
+
+    if (response.isSuccessful == false) {
+      throw CallException(response.message(), response.code())
+    }
+
+    return response.body()
+  }
+  //endregion
+
 //  //region delete
 //  fun deletePost(postId: Int): Boolean {
 //    services.deletePost(postId).execute().body()

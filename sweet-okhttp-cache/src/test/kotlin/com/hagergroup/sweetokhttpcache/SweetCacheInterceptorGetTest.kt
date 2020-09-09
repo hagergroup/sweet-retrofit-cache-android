@@ -24,7 +24,7 @@ package com.hagergroup.sweetokhttpcache
 
 import android.app.Application
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.hagergroup.sweetokhttpcache.ws.IJsonPlaceHolderServices
+import com.hagergroup.sweetokhttpcache.ws.JsonPlaceHolderServices
 import com.hagergroup.sweetokhttpcache.ws.JsonPlaceHolderWebServiceCaller
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
@@ -68,7 +68,7 @@ class SweetCacheInterceptorGetTest {
    */
   @Test
   fun getPostWithIdNetworkFirstTest() = runBlocking {
-    val post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(IJsonPlaceHolderServices.CachePolicies.NetworkFirst.name, 2)
+    val post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.NetworkFirst.name, 2)
 
     Assert.assertNotNull(post)
     Assert.assertEquals(post?.id, 2)
@@ -86,7 +86,7 @@ class SweetCacheInterceptorGetTest {
    */
   @Test
   fun getPostWithIdNetworkOnlyTest() = runBlocking {
-    val post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(IJsonPlaceHolderServices.CachePolicies.NetworkOnly.name, 3)
+    val post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.NetworkOnly.name, 3)
 
     Assert.assertNotNull(post)
     Assert.assertEquals(post?.id, 3)
@@ -104,14 +104,14 @@ class SweetCacheInterceptorGetTest {
    */
   @Test
   fun getPostWithIdCacheOnlyTest() = runBlocking {
-    val post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(IJsonPlaceHolderServices.CachePolicies.NetworkOnly.name, 4)
+    val post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.NetworkOnly.name, 4)
 
     Assert.assertNotNull(post)
     Assert.assertEquals(post?.id, 4)
     Assert.assertEquals(post?.userId, 1)
     Assert.assertEquals(post?.title, "eum et est occaecati")
 
-    val otherPost = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(IJsonPlaceHolderServices.CachePolicies.CacheOnly.name, 4)
+    val otherPost = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheOnly.name, 4)
 
     Assert.assertNotNull(otherPost)
     Assert.assertEquals(otherPost?.id, 4)
@@ -129,7 +129,7 @@ class SweetCacheInterceptorGetTest {
    */
   @Test
   fun getPostWithIdCacheFirstTest() = runBlocking {
-    val post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(IJsonPlaceHolderServices.CachePolicies.CacheFirst5Minutes.name, 5)
+    val post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheFirst5Minutes.name, 5)
 
     Assert.assertNotNull(post)
     Assert.assertEquals(post?.id, 5)
@@ -148,7 +148,7 @@ class SweetCacheInterceptorGetTest {
   @Test
   fun getPostWithIdCacheOnlyErrorTest(): Unit = runBlocking {
     try {
-      JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(IJsonPlaceHolderServices.CachePolicies.CacheOnly.name, 6)
+      JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheOnly.name, 6)
 
       Assert.assertTrue(false)
     } catch (exception: Exception) {
