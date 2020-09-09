@@ -39,7 +39,6 @@ dependencies {
   add("testImplementation", groovy.util.Eval.x(project, "x.dep.junit"))
   add("testImplementation", groovy.util.Eval.x(project, "x.dep.androidx.testJUnit"))
   add("testImplementation", groovy.util.Eval.x(project, "x.dep.robolectric"))
-
   add("testImplementation", groovy.util.Eval.x(project, "x.dep.okHttp.logging"))
   add("testImplementation", groovy.util.Eval.x(project, "x.dep.retrofit.retrofit"))
   add("testImplementation", groovy.util.Eval.x(project, "x.dep.retrofit.moshiConverter"))

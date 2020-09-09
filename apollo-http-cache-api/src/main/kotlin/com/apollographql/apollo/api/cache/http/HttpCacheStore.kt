@@ -31,4 +31,11 @@ interface HttpCacheStore {
    */
   @Throws(IOException::class)
   fun delete()
+
+  /**
+   * Closes the cache and deletes all of its stored values. This will delete all files in the cache directory including
+   * files that weren't created by the cache.
+   */
+  @Throws(IOException::class)
+  fun delete(timeout: Long)
 }

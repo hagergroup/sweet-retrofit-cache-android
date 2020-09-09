@@ -14,6 +14,11 @@ interface HttpCache {
   fun clear()
 
   /**
+   * Clear cached http responses
+   */
+  fun clear(timeout: Long)
+
+  /**
    * Remove cached http response by [cacheKey]. May throw [IOException]
    */
   @Throws(IOException::class)
@@ -81,5 +86,30 @@ interface HttpCache {
      * Signals that HTTP response comes from the local cache
      */
     const val FROM_CACHE = "X-APOLLO-FROM-CACHE"
+
+    /**
+     *
+     */
+    const val CACHE_POLICY_ID = "CachePolicyId"
+
+    /**
+     *
+     */
+    const val CACHE_CLEANER_POLICY_ID = "CacheCleanerPolicyId"
+
+    /**
+     *
+     */
+    const val CACHE_CLEANER_POLICY_CLEAN_UP_ALL = "CacheCleanerPolicyCleanUpAll"
+
+    /**
+     *
+     */
+    const val CACHE_CLEANER_POLICY_CLEAN_UP = "CacheCleanerPolicyCleanUp"
+
+    /**
+     *
+     */
+    const val CACHE_CLEANER_POLICY_TIME_OUT = "CacheCleanerPolicyTimeOut"
   }
 }

@@ -26,11 +26,15 @@ import android.app.Application
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hagergroup.sweetokhttpcache.ws.JsonPlaceHolderServices
 import com.hagergroup.sweetokhttpcache.ws.JsonPlaceHolderWebServiceCaller
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 /**
  * @author Ludovic Roland
@@ -39,6 +43,11 @@ import org.robolectric.annotation.Config
 @RunWith(AndroidJUnit4::class)
 @Config(application = Application::class)
 class SweetCacheInterceptorGetTest {
+
+  @Before
+  fun setUp() {
+    Timber.plant(Timber.DebugTree())
+  }
 
   /**
   {
@@ -186,6 +195,116 @@ class SweetCacheInterceptorGetTest {
     } catch (exception: Exception) {
       Assert.assertTrue(exception is CallException)
     }
+  }
+
+  @Test
+  fun cleanUpAllTest() = runBlocking {
+    var post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.NetworkFirst.name, 8)
+
+    Assert.assertNotNull(post)
+    Assert.assertEquals(post?.id, 8)
+    Assert.assertEquals(post?.userId, 1)
+    Assert.assertEquals(post?.title, "dolorem dolore est ipsam")
+
+    var cachedPost = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheOnly.name, 8)
+
+    Assert.assertNotNull(cachedPost)
+    Assert.assertEquals(cachedPost?.id, 8)
+    Assert.assertEquals(cachedPost?.userId, 1)
+    Assert.assertEquals(cachedPost?.title, "dolorem dolore est ipsam")
+
+    val result = JsonPlaceHolderWebServiceCaller.cleanUpAll()
+    Assert.assertTrue(result)
+
+    try {
+      JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheOnly.name, 8)
+
+      Assert.assertTrue(false)
+    } catch (exception: Exception) {
+      Assert.assertTrue(exception is CallException)
+    }
+
+    post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.NetworkFirst.name, 8)
+
+    Assert.assertNotNull(post)
+    Assert.assertEquals(post?.id, 8)
+    Assert.assertEquals(post?.userId, 1)
+    Assert.assertEquals(post?.title, "dolorem dolore est ipsam")
+
+    cachedPost = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheOnly.name, 8)
+
+    Assert.assertNotNull(cachedPost)
+    Assert.assertEquals(cachedPost?.id, 8)
+    Assert.assertEquals(cachedPost?.userId, 1)
+    Assert.assertEquals(cachedPost?.title, "dolorem dolore est ipsam")
+  }
+
+  @Test
+  fun cleanUpTest() = runBlocking {
+    var post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.NetworkFirst.name, 9)
+
+    Assert.assertNotNull(post)
+    Assert.assertEquals(post?.id, 9)
+    Assert.assertEquals(post?.userId, 1)
+    Assert.assertEquals(post?.title, "nesciunt iure omnis dolorem tempora et accusantium")
+
+    var cachedPost = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheOnly.name, 9)
+
+    Assert.assertNotNull(cachedPost)
+    Assert.assertEquals(cachedPost?.id, 9)
+    Assert.assertEquals(cachedPost?.userId, 1)
+    Assert.assertEquals(cachedPost?.title, "nesciunt iure omnis dolorem tempora et accusantium")
+
+    var result = JsonPlaceHolderWebServiceCaller.cleanUp(20L, TimeUnit.SECONDS)
+    Assert.assertTrue(result)
+
+    cachedPost = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheOnly.name, 9)
+
+    Assert.assertNotNull(cachedPost)
+    Assert.assertEquals(cachedPost?.id, 9)
+    Assert.assertEquals(cachedPost?.userId, 1)
+    Assert.assertEquals(cachedPost?.title, "nesciunt iure omnis dolorem tempora et accusantium")
+
+    delay(20 * 1000)
+
+    val otherPost = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.NetworkFirst.name, 10)
+
+    Assert.assertNotNull(otherPost)
+    Assert.assertEquals(otherPost?.id, 10)
+    Assert.assertEquals(otherPost?.userId, 1)
+    Assert.assertEquals(otherPost?.title, "optio molestias id quia eum")
+
+    result = JsonPlaceHolderWebServiceCaller.cleanUp(20L, TimeUnit.SECONDS)
+    Assert.assertTrue(result)
+
+    try {
+      JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheOnly.name, 9)
+
+      Assert.assertTrue(false)
+    } catch (exception: Exception) {
+      Assert.assertTrue(exception is CallException)
+    }
+
+    post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.NetworkFirst.name, 9)
+
+    Assert.assertNotNull(post)
+    Assert.assertEquals(post?.id, 9)
+    Assert.assertEquals(post?.userId, 1)
+    Assert.assertEquals(post?.title, "nesciunt iure omnis dolorem tempora et accusantium")
+
+    cachedPost = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheOnly.name, 9)
+
+    Assert.assertNotNull(cachedPost)
+    Assert.assertEquals(cachedPost?.id, 9)
+    Assert.assertEquals(cachedPost?.userId, 1)
+    Assert.assertEquals(cachedPost?.title, "nesciunt iure omnis dolorem tempora et accusantium")
+
+    val otherCachedPost = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheOnly.name, 10)
+
+    Assert.assertNotNull(otherCachedPost)
+    Assert.assertEquals(otherCachedPost?.id, 10)
+    Assert.assertEquals(otherCachedPost?.userId, 1)
+    Assert.assertEquals(otherCachedPost?.title, "optio molestias id quia eum")
   }
 
 }

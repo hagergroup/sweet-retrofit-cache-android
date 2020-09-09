@@ -2,6 +2,7 @@ package com.apollographql.apollo.cache.http;
 
 import com.apollographql.apollo.api.cache.http.HttpCachePolicy;
 import com.apollographql.apollo.cache.http.internal.HttpDate;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -10,6 +11,7 @@ import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
+
 import okhttp3.Headers;
 import okhttp3.Protocol;
 import okhttp3.Request;
@@ -22,6 +24,7 @@ import okio.Okio;
 import okio.Sink;
 import okio.Source;
 
+import static com.apollographql.apollo.api.cache.http.HttpCache.CACHE_CLEANER_POLICY_ID;
 import static com.apollographql.apollo.api.cache.http.HttpCache.CACHE_DO_NOT_STORE;
 import static com.apollographql.apollo.api.cache.http.HttpCache.CACHE_EXPIRE_AFTER_READ_HEADER;
 import static com.apollographql.apollo.api.cache.http.HttpCache.CACHE_EXPIRE_TIMEOUT_HEADER;
@@ -49,6 +52,10 @@ final class Utils {
 
   static boolean isPrefetchResponse(Request request) {
     return Boolean.TRUE.toString().equalsIgnoreCase(request.header(CACHE_PREFETCH_HEADER));
+  }
+
+  static boolean shouldCleanUpCache(Request request) {
+    return request.header(CACHE_CLEANER_POLICY_ID) != null;
   }
 
   static boolean shouldSkipCache(Request request) {

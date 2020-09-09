@@ -22,8 +22,8 @@
 
 package com.hagergroup.sweetokhttpcache.ws
 
+import com.apollographql.apollo.api.cache.http.HttpCache
 import com.apollographql.apollo.api.cache.http.HttpCachePolicy
-import com.hagergroup.sweetokhttpcache.SweetCacheInterceptor
 import com.hagergroup.sweetokhttpcache.bo.PartialPost
 import com.hagergroup.sweetokhttpcache.bo.Post
 import okhttp3.ResponseBody
@@ -32,6 +32,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Headers
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -63,30 +64,38 @@ interface JsonPlaceHolderServices {
   suspend fun getPostWithIdNoCache(@Path("postId") postId: Int): Response<Post?>
 
   @GET("posts/{postId}")
-  suspend fun getPostWithIdCachePolicy(@Header(SweetCacheInterceptor.CACHE_POLICY_ID) cacheId: String, @Path("postId") postId: Int): Response<Post?>
+  suspend fun getPostWithIdCachePolicy(@Header(HttpCache.CACHE_POLICY_ID) cacheId: String, @Path("postId") postId: Int): Response<Post?>
 
   @POST("posts")
   suspend fun createPostNoCache(@Body post: Post): Response<Post?>
 
   @POST("posts")
-  suspend fun createPostCachePolicy(@Header(SweetCacheInterceptor.CACHE_POLICY_ID) cacheId: String, @Body post: Post): Response<Post?>
+  suspend fun createPostCachePolicy(@Header(HttpCache.CACHE_POLICY_ID) cacheId: String, @Body post: Post): Response<Post?>
 
   @PUT("posts/{postId}")
   suspend fun updatePostPutNoCache(@Path("postId") postId: Int, @Body post: Post): Response<Post?>
 
   @PUT("posts/{postId}")
-  suspend fun updatePostPutCachePolicy(@Header(SweetCacheInterceptor.CACHE_POLICY_ID) cacheId: String, @Path("postId") postId: Int, @Body post: Post): Response<Post?>
+  suspend fun updatePostPutCachePolicy(@Header(HttpCache.CACHE_POLICY_ID) cacheId: String, @Path("postId") postId: Int, @Body post: Post): Response<Post?>
 
   @PATCH("posts/{postId}")
   suspend fun updatePostPatchNoCache(@Path("postId") postId: Int, @Body partialPost: PartialPost): Response<Post?>
 
   @PATCH("posts/{postId}")
-  suspend fun updatePostPatchCachePolicy(@Header(SweetCacheInterceptor.CACHE_POLICY_ID) cacheId: String, @Path("postId") postId: Int, @Body partialPost: PartialPost): Response<Post?>
+  suspend fun updatePostPatchCachePolicy(@Header(HttpCache.CACHE_POLICY_ID) cacheId: String, @Path("postId") postId: Int, @Body partialPost: PartialPost): Response<Post?>
 
   @DELETE("posts/{postId}")
   suspend fun deletePostNoCache(@Path("postId") postId: Int): Response<ResponseBody>
 
   @DELETE("posts/{postId}")
-  suspend fun deletePostCachePolicy(@Header(SweetCacheInterceptor.CACHE_POLICY_ID) cacheId: String,@Path("postId") postId: Int): Response<ResponseBody>
+  suspend fun deletePostCachePolicy(@Header(HttpCache.CACHE_POLICY_ID) cacheId: String, @Path("postId") postId: Int): Response<ResponseBody>
+
+  @DELETE("/")
+  @Headers("${HttpCache.CACHE_CLEANER_POLICY_ID}:${HttpCache.CACHE_CLEANER_POLICY_CLEAN_UP_ALL}")
+  suspend fun cleanUpAll(): Response<ResponseBody>
+
+  @DELETE("/")
+  @Headers("${HttpCache.CACHE_CLEANER_POLICY_ID}:${HttpCache.CACHE_CLEANER_POLICY_CLEAN_UP}")
+  suspend fun cleanUp(@Header(HttpCache.CACHE_CLEANER_POLICY_TIME_OUT) timeout: Long): Response<ResponseBody>
 
 }

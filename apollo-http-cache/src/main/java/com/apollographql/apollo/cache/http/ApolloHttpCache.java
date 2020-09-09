@@ -6,15 +6,17 @@ import com.apollographql.apollo.api.cache.http.HttpCacheRecord;
 import com.apollographql.apollo.api.cache.http.HttpCacheRecordEditor;
 import com.apollographql.apollo.api.cache.http.HttpCacheStore;
 import com.apollographql.apollo.api.internal.ApolloLogger;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+
 import okhttp3.Interceptor;
 import okhttp3.Response;
 import okio.ForwardingSource;
 import okio.Sink;
 import okio.Source;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.io.IOException;
 
 import static com.apollographql.apollo.api.internal.Utils.checkNotNull;
 import static com.apollographql.apollo.cache.http.Utils.copyResponseBody;
@@ -38,6 +40,14 @@ public final class ApolloHttpCache implements HttpCache {
   @Override public void clear() {
     try {
       cacheStore.delete();
+    } catch (IOException e) {
+      logger.e(e, "Failed to clear http cache");
+    }
+  }
+
+  @Override public void clear(long timeout) {
+    try {
+      cacheStore.delete(timeout);
     } catch (IOException e) {
       logger.e(e, "Failed to clear http cache");
     }

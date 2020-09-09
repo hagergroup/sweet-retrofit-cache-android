@@ -1,18 +1,25 @@
 package com.apollographql.apollo.cache.http;
 
 import com.apollographql.apollo.api.internal.ApolloLogger;
-import okhttp3.Interceptor;
-import okhttp3.Request;
-import okhttp3.Response;
 
 import java.io.IOException;
 
+import okhttp3.Interceptor;
+import okhttp3.Protocol;
+import okhttp3.Request;
+import okhttp3.Response;
+
+import static com.apollographql.apollo.api.cache.http.HttpCache.CACHE_CLEANER_POLICY_CLEAN_UP;
+import static com.apollographql.apollo.api.cache.http.HttpCache.CACHE_CLEANER_POLICY_CLEAN_UP_ALL;
+import static com.apollographql.apollo.api.cache.http.HttpCache.CACHE_CLEANER_POLICY_ID;
+import static com.apollographql.apollo.api.cache.http.HttpCache.CACHE_CLEANER_POLICY_TIME_OUT;
 import static com.apollographql.apollo.api.cache.http.HttpCache.CACHE_KEY_HEADER;
 import static com.apollographql.apollo.api.internal.Utils.checkNotNull;
 import static com.apollographql.apollo.cache.http.Utils.isNetworkFirst;
 import static com.apollographql.apollo.cache.http.Utils.isNetworkOnly;
 import static com.apollographql.apollo.cache.http.Utils.isPrefetchResponse;
 import static com.apollographql.apollo.cache.http.Utils.isStale;
+import static com.apollographql.apollo.cache.http.Utils.shouldCleanUpCache;
 import static com.apollographql.apollo.cache.http.Utils.shouldExpireAfterRead;
 import static com.apollographql.apollo.cache.http.Utils.shouldSkipCache;
 import static com.apollographql.apollo.cache.http.Utils.shouldSkipNetwork;
@@ -31,6 +38,11 @@ final class HttpCacheInterceptor implements Interceptor {
 
   @Override public Response intercept(Chain chain) throws IOException {
     Request request = chain.request();
+    if (shouldCleanUpCache(request)) {
+      logger.d("Clean up http cache");
+      return cleanUpCacheResponse(request);
+    }
+
     if (shouldSkipCache(request)) {
       logger.d("Skip http cache for request: %s", request);
       return chain.proceed(request);
@@ -66,6 +78,31 @@ final class HttpCacheInterceptor implements Interceptor {
     return cacheResponse.newBuilder()
         .cacheResponse(strip(cacheResponse))
         .build();
+  }
+
+  private Response cleanUpCacheResponse(Request request) throws IOException {
+    if (CACHE_CLEANER_POLICY_CLEAN_UP_ALL.equals(request.header(CACHE_CLEANER_POLICY_ID))) {
+      cleanUpAllCache();
+    } else if (CACHE_CLEANER_POLICY_CLEAN_UP.equals(request.header(CACHE_CLEANER_POLICY_ID))) {
+      cleanUpCache(request);
+    }
+
+    return new Response.Builder()
+        .code(200)
+        .body(NoContentResponseBody.create())
+        .message("OK")
+        .protocol(Protocol.HTTP_1_1)
+        .request(request)
+        .build();
+  }
+
+  private void cleanUpAllCache() {
+    cache.clear();
+  }
+
+  private void cleanUpCache(Request request) throws NumberFormatException {
+    final long timeout = Long.parseLong(request.header(CACHE_CLEANER_POLICY_TIME_OUT));
+    cache.clear(timeout);
   }
 
   private Response networkOnly(Request request, Chain chain) throws IOException {

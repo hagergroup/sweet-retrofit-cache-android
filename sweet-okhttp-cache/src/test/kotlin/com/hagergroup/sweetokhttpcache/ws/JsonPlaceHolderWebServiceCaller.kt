@@ -177,5 +177,17 @@ object JsonPlaceHolderWebServiceCaller {
 
     return true
   }
-//  //endregion
+  //endregion
+
+  //region clean
+  suspend fun cleanUpAll(): Boolean =
+    services.cleanUpAll().code() == 200
+
+  suspend fun cleanUp(cleanTimeout: Long, cleanTimeUnit: TimeUnit): Boolean
+  {
+    val newTimeout = TimeUnit.MILLISECONDS.convert(cleanTimeout, cleanTimeUnit)
+
+    return services.cleanUp(newTimeout).code() == 200
+  }
+  //endregion
 }

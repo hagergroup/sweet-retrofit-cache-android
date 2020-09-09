@@ -28,13 +28,11 @@ import com.apollographql.apollo.cache.http.DiskLruHttpCacheStore
 import com.hagergroup.sweetokhttpcache.SweetCacheInterceptor
 import okhttp3.OkHttpClient
 import java.io.File
-import java.io.IOException
 
 /**
  * @author Ludovic Roland
  * @since 2020.09.08
  */
-@Throws(IOException::class)
 fun OkHttpClient.Builder.addSweetHttpCache(cachePolicies: Map<String, HttpCachePolicy.Policy>, directory: File, cacheSize: Long = 1024 * 1024): OkHttpClient.Builder {
   addInterceptor(SweetCacheInterceptor(cachePolicies))
   addInterceptor(ApolloHttpCache(DiskLruHttpCacheStore(directory, cacheSize)).interceptor())

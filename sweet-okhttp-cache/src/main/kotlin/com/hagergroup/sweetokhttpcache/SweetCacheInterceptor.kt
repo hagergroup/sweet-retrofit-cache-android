@@ -22,6 +22,7 @@
 
 package com.hagergroup.sweetokhttpcache
 
+import com.apollographql.apollo.api.cache.http.HttpCache
 import com.apollographql.apollo.api.cache.http.HttpCachePolicy
 import com.hagergroup.sweetokhttpcache.request.decorateRequest
 import okhttp3.Interceptor
@@ -33,15 +34,9 @@ import okhttp3.Response
  */
 class SweetCacheInterceptor(private val cachePolicies: Map<String, HttpCachePolicy.Policy>) : Interceptor {
 
-  companion object {
-
-    const val CACHE_POLICY_ID = "CachePolicyId"
-
-  }
-
   override fun intercept(chain: Interceptor.Chain): Response {
     var request = chain.request()
-    val cachePolicyId = request.header(CACHE_POLICY_ID)
+    val cachePolicyId = request.header(HttpCache.CACHE_POLICY_ID)
 
     if (cachePolicyId != null) {
       val cachePolicy = cachePolicies[cachePolicyId]

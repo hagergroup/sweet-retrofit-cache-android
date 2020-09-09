@@ -43,7 +43,7 @@ fun Request.decorateRequest(cachePolicy: HttpCachePolicy.Policy): Request {
   body()?.writeTo(hashBuffer)
   val bodyHex = hashBuffer.readByteString().md5().hex()
 
-  val cacheKey = "$methodHex-$urlHex-$bodyHex"
+  val cacheKey = "sweet-$methodHex-$urlHex-$bodyHex"
 
   Timber.d("Created the cacheKey : '$cacheKey'")
 

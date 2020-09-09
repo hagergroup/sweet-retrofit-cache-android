@@ -5,13 +5,16 @@ import com.apollographql.apollo.api.cache.http.HttpCacheRecordEditor;
 import com.apollographql.apollo.api.cache.http.HttpCacheStore;
 import com.apollographql.apollo.cache.http.internal.DiskLruCache;
 import com.apollographql.apollo.cache.http.internal.FileSystem;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import okio.Sink;
 import okio.Source;
-import org.jetbrains.annotations.NotNull;
 
 public final class DiskLruHttpCacheStore implements HttpCacheStore {
   private static final int VERSION = 99991;
@@ -105,6 +108,26 @@ public final class DiskLruHttpCacheStore implements HttpCacheStore {
     try {
       cache.delete();
       cache = createDiskLruCache();
+    } finally {
+      cacheLock.writeLock().unlock();
+    }
+  }
+
+  @Override public void delete(long timeout) throws IOException {
+    cacheLock.writeLock().lock();
+    try {
+      final File[] files = cache.getDirectory().listFiles();
+      if (files != null) {
+        for (final File file : files) {
+          if (file != null && file.getName().startsWith("sweet-")) {
+            final long lastModified = file.lastModified();
+
+            if (System.currentTimeMillis() - lastModified >= timeout) {
+              cache.remove(file.getName().replaceFirst("[.][^.]+$", ""));
+            }
+          }
+        }
+      }
     } finally {
       cacheLock.writeLock().unlock();
     }
