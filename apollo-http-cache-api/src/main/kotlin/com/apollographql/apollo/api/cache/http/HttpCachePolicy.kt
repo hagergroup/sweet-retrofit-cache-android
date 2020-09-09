@@ -36,7 +36,7 @@ object HttpCachePolicy {
    * Signals the apollo client to delete the http cache.
    */
   @JvmField
-  val DELETE = ExpirePolicy(FetchStrategy.DELETE)
+  val DELETE = ExpirePolicy(FetchStrategy.CACHE_ONLY).expireAfterRead()
 
   /**
    * Abstraction for http cache policy configurations
@@ -110,10 +110,5 @@ object HttpCachePolicy {
      * response from the http cache.
      */
     NETWORK_FIRST,
-
-    /**
-     * Signals the apollo client to delete the http cache.
-     */
-    DELETE
   }
 }

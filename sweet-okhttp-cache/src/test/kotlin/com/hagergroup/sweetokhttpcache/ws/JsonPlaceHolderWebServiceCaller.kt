@@ -157,21 +157,25 @@ object JsonPlaceHolderWebServiceCaller {
   }
   //endregion
 
-//  //region delete
-//  fun deletePost(postId: Int): Boolean {
-//    services.deletePost(postId).execute().body()
-//    return true
-//  }
-//
-//  fun deletePostWithCacheOnly(postId: Int): Boolean {
-//    retrofit.executeWithCachePolicy(HttpCachePolicy.cacheOnly, services.deletePost(postId).request())
-//    return true
-//  }
-//
-//  fun deletePostWithCache(postId: Int): Boolean {
-//    retrofit.executeWithCachePolicy(HttpCachePolicy.cacheFirst.expireAfter(10, TimeUnit.SECONDS), services.deletePost(postId).request())
-//    return true
-//  }
-//
+  //region delete
+  suspend fun deletePostNoCache(postId: Int): Boolean {
+    val response = services.deletePostNoCache(postId)
+
+    if (response.isSuccessful == false) {
+      throw CallException(response.message(), response.code())
+    }
+
+    return true
+  }
+
+  suspend fun deletePostCachePolicy(cachePolicyName: String, postId: Int): Boolean {
+    val response = services.deletePostCachePolicy(cachePolicyName, postId)
+
+    if (response.isSuccessful == false) {
+      throw CallException(response.message(), response.code())
+    }
+
+    return true
+  }
 //  //endregion
 }

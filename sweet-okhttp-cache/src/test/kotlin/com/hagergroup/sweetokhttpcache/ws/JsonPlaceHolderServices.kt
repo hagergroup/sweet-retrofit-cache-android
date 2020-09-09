@@ -26,8 +26,10 @@ import com.apollographql.apollo.api.cache.http.HttpCachePolicy
 import com.hagergroup.sweetokhttpcache.SweetCacheInterceptor
 import com.hagergroup.sweetokhttpcache.bo.PartialPost
 import com.hagergroup.sweetokhttpcache.bo.Post
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PATCH
@@ -81,8 +83,10 @@ interface JsonPlaceHolderServices {
   @PATCH("posts/{postId}")
   suspend fun updatePostPatchCachePolicy(@Header(SweetCacheInterceptor.CACHE_POLICY_ID) cacheId: String, @Path("postId") postId: Int, @Body partialPost: PartialPost): Response<Post?>
 
+  @DELETE("posts/{postId}")
+  suspend fun deletePostNoCache(@Path("postId") postId: Int): Response<ResponseBody>
 
-//  @DELETE("posts/{postId}")
-//  fun deletePost(@Path("postId") postId: Int): Call<ResponseBody>
+  @DELETE("posts/{postId}")
+  suspend fun deletePostCachePolicy(@Header(SweetCacheInterceptor.CACHE_POLICY_ID) cacheId: String,@Path("postId") postId: Int): Response<ResponseBody>
 
 }

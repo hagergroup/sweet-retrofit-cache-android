@@ -156,4 +156,36 @@ class SweetCacheInterceptorGetTest {
     }
   }
 
+  @Test
+  fun getPostWithIdDeleteAfterReadTest(): Unit = runBlocking {
+    val post = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.NetworkOnly.name, 7)
+
+    Assert.assertNotNull(post)
+    Assert.assertEquals(post?.id, 7)
+    Assert.assertEquals(post?.userId, 1)
+    Assert.assertEquals(post?.title, "magnam facilis autem")
+
+    val cachedPost = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheOnly.name, 7)
+
+    Assert.assertNotNull(cachedPost)
+    Assert.assertEquals(cachedPost?.id, 7)
+    Assert.assertEquals(cachedPost?.userId, 1)
+    Assert.assertEquals(cachedPost?.title, "magnam facilis autem")
+
+    val deletedPost = JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.Delete.name, 7)
+
+    Assert.assertNotNull(deletedPost)
+    Assert.assertEquals(deletedPost?.id, 7)
+    Assert.assertEquals(deletedPost?.userId, 1)
+    Assert.assertEquals(deletedPost?.title, "magnam facilis autem")
+
+    try {
+      JsonPlaceHolderWebServiceCaller.getPostWithIdCachePolicy(JsonPlaceHolderServices.CachePolicies.CacheOnly.name, 7)
+
+      Assert.assertTrue(false)
+    } catch (exception: Exception) {
+      Assert.assertTrue(exception is CallException)
+    }
+  }
+
 }
