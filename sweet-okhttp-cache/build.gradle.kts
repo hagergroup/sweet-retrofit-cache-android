@@ -2,10 +2,16 @@ plugins {
   id("com.android.library")
   kotlin("android")
   kotlin("kapt")
+
+  maven
 }
 
 android {
   compileSdkVersion(groovy.util.Eval.x(project, "x.androidConfig.compileSdkVersion").toString().toInt())
+
+  defaultConfig {
+    versionName = "2.3.1-SNAPSHOT"
+  }
 
   sourceSets["main"].java.srcDir("src/main/kotlin")
   sourceSets["test"].java.srcDir("src/test/kotlin")
@@ -44,4 +50,24 @@ dependencies {
   add("testImplementation", groovy.util.Eval.x(project, "x.dep.retrofit.moshiConverter"))
   add("testImplementation", groovy.util.Eval.x(project, "x.dep.moshi.kotlin"))
   add("kaptTest", groovy.util.Eval.x(project, "x.dep.moshi.kotlinCodegen"))
+}
+
+tasks.named<Upload>("uploadArchives") {
+  repositories.withGroovyBuilder {
+   "mavenDeployer" {
+      "snapshotRepository"("url" to findProperty("azureArtifactsUrl")) {
+        "authentication"("userName" to findProperty("azureArtifactsUsername"), "password" to findProperty("azureArtifactsGradleAccessToken"))
+      }
+
+      "pom" {
+        "project" {
+          setProperty("name", "Sweet OkHttp Cache")
+          setProperty("groupId", "com.hagergroup")
+          setProperty("artifactId", "sweet-okhttp-cache")
+          setProperty("version", android.defaultConfig.versionName)
+          setProperty("packaging", "aar")
+        }
+      }
+    }
+  }
 }
