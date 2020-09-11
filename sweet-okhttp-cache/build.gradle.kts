@@ -11,16 +11,8 @@ plugins {
 android {
   compileSdkVersion(groovy.util.Eval.x(project, "x.androidConfig.compileSdkVersion").toString().toInt())
 
-  defaultConfig {
-    versionName = "2.3.1-SNAPSHOT"
-  }
-
   sourceSets["main"].java.srcDir("src/main/kotlin")
-  sourceSets["test"].java.srcDir("src/test/kotlin")
-
-  testOptions {
-    unitTests.isIncludeAndroidResources = true
-  }
+  sourceSets["androidTest"].java.srcDir("src/androidTest/kotlin")
 
   lintOptions {
     textReport = true
@@ -29,9 +21,16 @@ android {
   }
 
   defaultConfig {
+    versionName = "2.3.1-SNAPSHOT"
+
     minSdkVersion(groovy.util.Eval.x(project, "x.androidConfig.minSdkVersion").toString())
     targetSdkVersion(groovy.util.Eval.x(project, "x.androidConfig.targetSdkVersion").toString())
-    testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+    testOptions {
+      unitTests.isIncludeAndroidResources = true
+    }
   }
 }
 
@@ -44,14 +43,17 @@ dependencies {
   add("implementation", groovy.util.Eval.x(project, "x.dep.kotlin.coroutinesAndroid"))
 
   //tests
-  add("testImplementation", groovy.util.Eval.x(project, "x.dep.junit"))
-  add("testImplementation", groovy.util.Eval.x(project, "x.dep.androidx.testJUnit"))
-  add("testImplementation", groovy.util.Eval.x(project, "x.dep.robolectric"))
-  add("testImplementation", groovy.util.Eval.x(project, "x.dep.okHttp.logging"))
-  add("testImplementation", groovy.util.Eval.x(project, "x.dep.retrofit.retrofit"))
-  add("testImplementation", groovy.util.Eval.x(project, "x.dep.retrofit.moshiConverter"))
-  add("testImplementation", groovy.util.Eval.x(project, "x.dep.moshi.kotlin"))
-  add("kaptTest", groovy.util.Eval.x(project, "x.dep.moshi.kotlinCodegen"))
+  add("androidTestImplementation", groovy.util.Eval.x(project, "x.dep.junit"))
+  add("androidTestImplementation", groovy.util.Eval.x(project, "x.dep.androidx.testJUnit"))
+  add("androidTestImplementation", groovy.util.Eval.x(project, "x.dep.androidx.testRunner"))
+
+  add("androidTestImplementation", groovy.util.Eval.x(project, "x.dep.koin.android"))
+  add("androidTestImplementation", groovy.util.Eval.x(project, "x.dep.koin.test"))
+  add("androidTestImplementation", groovy.util.Eval.x(project, "x.dep.okHttp.logging"))
+  add("androidTestImplementation", groovy.util.Eval.x(project, "x.dep.retrofit.retrofit"))
+  add("androidTestImplementation", groovy.util.Eval.x(project, "x.dep.retrofit.moshiConverter"))
+  add("androidTestImplementation", groovy.util.Eval.x(project, "x.dep.moshi.kotlin"))
+  add("kaptAndroidTest", groovy.util.Eval.x(project, "x.dep.moshi.kotlinCodegen"))
 }
 
 val name = "Sweet OkHttp Cache"

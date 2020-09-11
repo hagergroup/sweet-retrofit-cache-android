@@ -22,7 +22,7 @@
 
 package com.hagergroup.sweetokhttpcache.ws
 
-import android.os.Environment
+import android.content.Context
 import com.hagergroup.sweetokhttpcache.CallException
 import com.hagergroup.sweetokhttpcache.bo.PartialPost
 import com.hagergroup.sweetokhttpcache.bo.Post
@@ -30,6 +30,8 @@ import com.hagergroup.sweetokhttpcache.client.addSweetHttpCache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
@@ -38,7 +40,9 @@ import java.util.concurrent.TimeUnit
  * @author Ludovic Roland
  * @since 2020.09.08
  */
-object JsonPlaceHolderWebServiceCaller {
+object JsonPlaceHolderWebServiceCaller : KoinComponent {
+
+  private val context: Context by inject()
 
   private val services: JsonPlaceHolderServices
 
@@ -46,7 +50,7 @@ object JsonPlaceHolderWebServiceCaller {
     val okHttp = OkHttpClient.Builder().apply {
       readTimeout(10, TimeUnit.SECONDS)
       connectTimeout(10, TimeUnit.SECONDS)
-      addSweetHttpCache(JsonPlaceHolderServices.CachePolicies.toMap(), Environment.getDownloadCacheDirectory())
+      addSweetHttpCache(JsonPlaceHolderServices.CachePolicies.toMap(), context.cacheDir)
       addNetworkInterceptor(httpLoggingInterceptor())
     }.build()
 

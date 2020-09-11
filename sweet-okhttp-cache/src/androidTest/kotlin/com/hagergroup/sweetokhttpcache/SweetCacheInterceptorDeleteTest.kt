@@ -22,23 +22,39 @@
 
 package com.hagergroup.sweetokhttpcache
 
-import android.app.Application
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hagergroup.sweetokhttpcache.ws.JsonPlaceHolderServices
 import com.hagergroup.sweetokhttpcache.ws.JsonPlaceHolderWebServiceCaller
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.test.KoinTest
 
 /**
  * @author Ludovic Roland
  * @since 2020.09.08
  */
 @RunWith(AndroidJUnit4::class)
-@Config(application = Application::class)
-class SweetCacheInterceptorDeleteTest {
+class SweetCacheInterceptorDeleteTest : KoinTest {
+
+  @Before
+  fun before() {
+    startKoin {
+      androidContext(ApplicationProvider.getApplicationContext())
+    }
+  }
+
+  @After
+  fun after() {
+    stopKoin()
+  }
 
   @Test
   fun deletePostNoCacheTest() = runBlocking {
