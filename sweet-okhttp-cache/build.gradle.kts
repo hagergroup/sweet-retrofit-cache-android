@@ -56,7 +56,7 @@ dependencies {
   add("kaptAndroidTest", groovy.util.Eval.x(project, "x.dep.moshi.kotlinCodegen"))
 }
 
-val name = "Sweet OkHttp Cache"
+val name = "sweet-okhttp-cache"
 val groupId = "com.hagergroup"
 val artifactId = "sweet-okhttp-cache"
 
