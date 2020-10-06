@@ -4,7 +4,8 @@ plugins {
   kotlin("kapt")
 
   //deployment plugins
-  `maven`
+  maven
+  `maven-publish`
 }
 
 android {
@@ -20,7 +21,7 @@ android {
   }
 
   defaultConfig {
-    versionName = "2.4.1-SNAPSHOT"
+    versionName = "2.4.1"
 
     minSdkVersion(groovy.util.Eval.x(project, "x.androidConfig.minSdkVersion").toString())
     targetSdkVersion(groovy.util.Eval.x(project, "x.androidConfig.targetSdkVersion").toString())
@@ -58,12 +59,34 @@ dependencies {
 val libGroupId = "com.hagergroup"
 val libArtifactId = "sweet-okhttp-cache"
 
+val libSourcesJar by tasks.registering(Jar::class) {
+  archiveClassifier.set("sources")
+  from(android.sourceSets.getByName("main").java.srcDirs)
+}
+
+publishing {
+  publications {
+    create<MavenPublication>("sweetcache") {
+      from(components.findByName("release"))
+      artifact(libSourcesJar.get())
+    }
+  }
+}
+
+artifacts {
+  add("archives", libSourcesJar)
+}
+
 tasks.named<Upload>("uploadArchives") {
   repositories.withGroovyBuilder {
    "mavenDeployer" {
       "snapshotRepository"("url" to findProperty("azureArtifactsUrl")) {
         "authentication"("userName" to findProperty("azureArtifactsUsername"), "password" to findProperty("azureArtifactsGradleAccessToken"))
       }
+
+     "repository"("url" to "https://api.bintray.com/maven/hagergroup/Maven/sweet-okhttp-cache/;publish=1") {
+       "authentication"("userName" to findProperty("bintrayUsername"), "password" to findProperty("bintrayKey"))
+     }
 
       "pom" {
         "project" {
@@ -77,49 +100,3 @@ tasks.named<Upload>("uploadArchives") {
     }
   }
 }
-
-//bintray {
-//  user = property("BINTRAY_USER").toString()
-//  key = property("BINTRAY_KEY").toString()
-//
-//  publish = true
-//
-//  setPublications("mavenPublication")
-//
-//  pkg.apply {
-//    repo = "Maven"
-//    name = libArtifactId
-//    userOrg = "hagergroup"
-//    githubRepo = "hagergroup/sweet-okhttp-cache-android"
-//    vcsUrl = "https://github.com/hagergroup/sweet-okhttp-cache-android"
-//    description = "HTTP Cache for OkHttp"
-//    setLicenses("MIT")
-//    desc = description
-//    websiteUrl = "https://github.com/hagergroup/sweet-okhttp-cache-android"
-//    issueTrackerUrl = "https://github.com/hagergroup/sweet-okhttp-cache-android/issues"
-//    githubReleaseNotesFile = "README.md"
-//
-//    version.apply {
-//      name = android.defaultConfig.versionName
-//      desc = "https://github.com/hagergroup/sweet-okhttp-cache-android"
-//      vcsTag = android.defaultConfig.versionName
-//    }
-//  }
-//}
-//
-//val androidSourcesJar by tasks.registering(Jar::class) {
-//  archiveClassifier.set("sources")
-//  from(android.sourceSets.getByName("main").java.srcDirs)
-//}
-//
-//publishing {
-//  publications {
-//    create<MavenPublication>("mavenPublication") {
-//      groupId = groupId
-//      artifactId = artifactId
-//      version = android.defaultConfig.versionName
-//
-//      artifact(androidSourcesJar.get())
-//    }
-//  }
-//}
