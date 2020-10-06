@@ -21,7 +21,7 @@ android {
   }
 
   defaultConfig {
-    versionName = "2.3.1-SNAPSHOT"
+    versionName = "2.4.1-SNAPSHOT"
 
     minSdkVersion(groovy.util.Eval.x(project, "x.androidConfig.minSdkVersion").toString())
     targetSdkVersion(groovy.util.Eval.x(project, "x.androidConfig.targetSdkVersion").toString())
