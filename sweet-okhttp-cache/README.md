@@ -18,3 +18,7 @@ git push --tags
 ```
 
 Finally merge the `main` branch into the `sweet-okhttp-cache` one
+
+# TODO
+
+* Add the possibility to clean-up the cache
