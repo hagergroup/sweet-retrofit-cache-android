@@ -21,7 +21,7 @@ android {
   }
 
   defaultConfig {
-    versionName = "2.4.1"
+    versionName = "2.4.1-SNAPSHOT"
 
     minSdkVersion(groovy.util.Eval.x(project, "x.androidConfig.minSdkVersion").toString())
     targetSdkVersion(groovy.util.Eval.x(project, "x.androidConfig.targetSdkVersion").toString())
@@ -80,7 +80,7 @@ artifacts {
 tasks.named<Upload>("uploadArchives") {
   repositories.withGroovyBuilder {
    "mavenDeployer" {
-      "snapshotRepository"("url" to findProperty("azureArtifactsUrl")) {
+      "snapshotRepository"("url" to "https://pkgs.dev.azure.com/hagerdigitalfactory/_packaging/Maven/maven/v1") {
         "authentication"("userName" to findProperty("azureArtifactsUsername"), "password" to findProperty("azureArtifactsGradleAccessToken"))
       }
 
