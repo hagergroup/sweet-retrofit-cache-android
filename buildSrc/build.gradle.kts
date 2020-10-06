@@ -1,13 +1,6 @@
-buildscript {
-  repositories {
-    mavenCentral()
-  }
-  dependencies {
-    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.0")
-  }
+plugins {
+  id("org.jetbrains.kotlin.jvm").version("1.4.10")
 }
-
-apply(plugin = "org.jetbrains.kotlin.jvm")
 
 project.apply {
   from(file("../gradle/dependencies.gradle"))
@@ -27,6 +20,7 @@ dependencies {
   implementation(groovy.util.Eval.x(project, "x.dep.gradleJapiCmpPlugin"))
   implementation(groovy.util.Eval.x(project, "x.dep.kotlin.plugin"))
   implementation(groovy.util.Eval.x(project, "x.dep.sqldelight.plugin"))
+  implementation(groovy.util.Eval.x(project, "x.dep.gradlePublishPlugin"))
   // this plugin is added to the classpath but never applied, it is only used for the closeAndRelease code
   implementation(groovy.util.Eval.x(project, "x.dep.vanniktechPlugin"))
 }

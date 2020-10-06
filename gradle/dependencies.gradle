@@ -2,7 +2,7 @@ def versions = [
     minAndroidPlugin      : '3.4.2',
     androidPlugin         : '3.6.2',
     androidxSqlite        : '2.1.0',
-    apollo                : '2.3.1', // This should only be used by apollo-gradle-plugin-incubating:test to get the artifacts locally
+    apollo                : '2.4.1', // This should only be used by apollo-gradle-plugin-incubating:test to get the artifacts locally
     antlr4                : '4.5.3',
     cache                 : '2.0.2',
     compiletesting        : '0.15',
@@ -11,7 +11,7 @@ def versions = [
     javaPoet              : '1.9.0',
     jetbrainsAnnotations  : '13.0',
     junit                 : '4.12',
-    kotlin                : '1.4.0',
+    kotlin                : '1.4.10',
     kotlinCoroutines      : '1.3.9',
     kotlinPoet            : '1.5.0',
     mockito               : '1.9.5',
@@ -24,13 +24,12 @@ def versions = [
     rxjava                : '2.0.5',
     rxjava3               : '3.0.4',
     rxandroid             : '2.0.1',
-    sqldelight            : '1.4.1',
+    sqldelight            : '1.4.3',
     testRunner            : '0.5',
     truth                 : '0.30'
 ]
 
 ext.isCi = "true" == System.getenv('CI')
-
 ext.dep = [
     android               : [
         plugin    : "com.android.tools.build:gradle:$versions.androidPlugin",
@@ -41,8 +40,6 @@ ext.dep = [
         appcompat             : "androidx.appcompat:appcompat:1.1.0",
         espressoIdlingResource: "androidx.test.espresso:espresso-idling-resource:$versions.espressoIdlingResource",
         recyclerView          : "androidx.recyclerview:recyclerview:1.1.0",
-        testJUnit             : "androidx.test.ext:junit-ktx:1.1.2",
-        testRunner            : "androidx.test:runner:1.3.0",
         sqlite                : "androidx.sqlite:sqlite:${versions.androidxSqlite}",
         sqliteFramework       : "androidx.sqlite:sqlite-framework:${versions.androidxSqlite}",
     ],
@@ -60,10 +57,11 @@ ext.dep = [
         android: "org.koin:koin-android:$versions.koin",
         test    : "org.koin:koin-test:$versions.koin"
     ],
-    kotlinCompileTesting  : "com.github.tschuchortdev:kotlin-compile-testing:1.2.9",
+    kotlinCompileTesting  : "com.github.tschuchortdev:kotlin-compile-testing:1.2.10",
     cache                 : "com.nytimes.android:cache:$versions.cache",
     gradleJapiCmpPlugin   : "me.champeau.gradle:japicmp-gradle-plugin:0.2.8",
     vanniktechPlugin      : "com.vanniktech:gradle-maven-publish-plugin:0.11.1",
+    gradlePublishPlugin   : "com.gradle.publish:plugin-publish-plugin:0.12.0",
     guavaJre              : "com.google.guava:guava:$versions.guava",
     jetbrainsAnnotations  : "org.jetbrains:annotations:$versions.jetbrainsAnnotations",
     junit                 : "junit:junit:$versions.junit",
@@ -72,11 +70,11 @@ ext.dep = [
         coroutines         : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.kotlinCoroutines",
         coroutinesAndroid  : "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.kotlinCoroutines",
         coroutinesTest     : "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.kotlinCoroutines",
+        reflect            : "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin"
     ],
     mockito               : "org.mockito:mockito-all:$versions.mockito",
     moshi                 : [
         adapters     : "com.squareup.moshi:moshi-adapters:$versions.moshi",
-        kotlin       : "com.squareup.moshi:moshi-kotlin:$versions.moshi",
         kotlinCodegen: "com.squareup.moshi:moshi-kotlin-codegen:$versions.moshi",
         moshi        : "com.squareup.moshi:moshi:$versions.moshi",
     ],
@@ -92,10 +90,6 @@ ext.dep = [
         java  : "com.squareup:javapoet:$versions.javaPoet",
         kotlin: "com.squareup:kotlinpoet:$versions.kotlinPoet",
     ],
-    retrofit              : [
-        retrofit      : "com.squareup.retrofit2:retrofit:$versions.retrofit",
-        moshiConverter: "com.squareup.retrofit2:converter-moshi:$versions.retrofit",
-    ],
     rx                    : [
         java   : "io.reactivex.rxjava2:rxjava:$versions.rxjava",
         java3  : "io.reactivex.rxjava3:rxjava:$versions.rxjava3",
@@ -107,11 +101,21 @@ ext.dep = [
         native : "com.squareup.sqldelight:native-driver:$versions.sqldelight",
         plugin : "com.squareup.sqldelight:gradle-plugin:$versions.sqldelight"
     ],
-    timber                : "com.jakewharton.timber:timber:4.7.1",
     truth                 : "com.google.truth:truth:$versions.truth",
-    uuid                  : "com.benasher44:uuid:0.2.0"
+    uuid                  : "com.benasher44:uuid:0.2.0",
 ]
+
 ext.androidConfig = [
+        testJUnit             : "androidx.test.ext:junit-ktx:1.1.2",
+        testRunner            : "androidx.test:runner:1.3.0",
+        kotlin       : "com.squareup.moshi:moshi-kotlin:$versions.moshi",
+        logging4      : "com.squareup.okhttp3:logging-interceptor:$versions.okHttp4",
+    retrofit              : [
+        retrofit      : "com.squareup.retrofit2:retrofit:$versions.retrofit",
+        moshiConverter: "com.squareup.retrofit2:converter-moshi:$versions.retrofit",
+    ],
+    timber                : "com.jakewharton.timber:timber:4.7.1",
+    uuid                  : "com.benasher44:uuid:0.2.0"
     compileSdkVersion: 28,
     minSdkVersion    : 15,
     targetSdkVersion : 28
