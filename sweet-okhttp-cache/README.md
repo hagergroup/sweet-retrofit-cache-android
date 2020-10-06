@@ -1,10 +1,11 @@
 # Sync the project with the upstream repository
 
-if needed : 
+if needed: 
 ```
 git remote add upstream https://github.com/apollographql/apollo-android
 ```
 
+Then: 
 ```
 git checkout -b main
 git fetch upstream
@@ -14,4 +15,4 @@ git push --force
 git push --tags
 ```
 
-Then merge the master branch into the okhttp-cache one
+Finally merge the `main` branch into the `sweet-okhttp-cache` one
