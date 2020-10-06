@@ -1,3 +1,5 @@
+[![Build status](https://dev.azure.com/hagerdigitalfactory/Digital%20Factory%20Documentation/_apis/build/status/sweet-okhttp-cache-android/sweet-okhttp-android-release)](https://dev.azure.com/hagerdigitalfactory/Digital%20Factory%20Documentation/_build/latest?definitionId=116)  [ ![Download](https://api.bintray.com/packages/hagergroup/Maven/sweet-okhttp-cache/images/download.svg) ](https://bintray.com/hagergroup/Maven/sweet-okhttp-cache/_latestVersion)
+
 # Sync the project with the upstream repository
 
 if needed: 
