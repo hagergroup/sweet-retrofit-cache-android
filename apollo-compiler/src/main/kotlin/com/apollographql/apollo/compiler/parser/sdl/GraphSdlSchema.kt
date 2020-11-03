@@ -14,9 +14,9 @@ data class GraphSdlSchema(
   data class Schema(
       val description: String?,
       val directives: List<Directive>,
-      val queryRootOperationType: TypeRef.Named,
-      val mutationRootOperationType: TypeRef.Named,
-      val subscriptionRootOperationType: TypeRef.Named
+      val queryRootOperationType: String,
+      val mutationRootOperationType: String?,
+      val subscriptionRootOperationType: String?
   )
 
   sealed class TypeDefinition {
@@ -34,7 +34,8 @@ data class GraphSdlSchema(
       data class Value(
           val name: String,
           val description: String?,
-          val directives: List<Directive>
+          val directives: List<Directive>,
+          val sourceLocation: SourceLocation
       )
     }
 
@@ -58,7 +59,8 @@ data class GraphSdlSchema(
         val description: String?,
         val directives: List<Directive>,
         val type: TypeRef,
-        val arguments: List<Argument>
+        val arguments: List<Argument>,
+        val sourceLocation: SourceLocation
     ) {
       data class Argument(
           val name: String,
@@ -81,7 +83,8 @@ data class GraphSdlSchema(
         val description: String?,
         val directives: List<Directive>,
         val defaultValue: Any?,
-        val type: TypeRef
+        val type: TypeRef,
+        val sourceLocation: SourceLocation
     )
 
     data class Union(
@@ -101,7 +104,8 @@ data class GraphSdlSchema(
 
   data class Directive(
       val name: String,
-      val arguments: Map<String, String>
+      val arguments: Map<String, String>,
+      val sourceLocation: SourceLocation
   )
 
   sealed class TypeRef {
@@ -140,9 +144,9 @@ data class GraphSdlSchema(
 
 fun GraphSdlSchema.toIntrospectionSchema(): IntrospectionSchema {
   return IntrospectionSchema(
-      queryType = schema.queryRootOperationType.typeName,
-      mutationType = schema.mutationRootOperationType.typeName,
-      subscriptionType = schema.subscriptionRootOperationType.typeName,
+      queryType = schema.queryRootOperationType,
+      mutationType = schema.mutationRootOperationType,
+      subscriptionType = schema.subscriptionRootOperationType,
       types = typeDefinitions.mapValues { (_, typeDefinition) ->
         when (typeDefinition) {
           is GraphSdlSchema.TypeDefinition.Enum -> typeDefinition.toIntrospectionType()
@@ -290,7 +294,7 @@ private fun GraphSdlSchema.TypeDefinition.Field.Argument.toIntrospectionType(sch
 
 private fun List<GraphSdlSchema.Directive>.findDeprecatedDirective(): DeprecateDirective? {
   return find { directive -> directive.name == "deprecated" }?.let { directive ->
-    DeprecateDirective(directive.arguments["reason"]?.removePrefix("\"")?.removeSuffix("\""))
+    DeprecateDirective(directive.arguments["reason"]?.removePrefix("\"")?.removeSuffix("\"") ?: "No longer supported")
   }
 }
 

@@ -2,7 +2,7 @@ def versions = [
     minAndroidPlugin      : '3.4.2',
     androidPlugin         : '3.6.2',
     androidxSqlite        : '2.1.0',
-    apollo                : '2.4.1', // This should only be used by apollo-gradle-plugin-incubating:test to get the artifacts locally
+    apollo                : '2.4.2', // This should only be used by apollo-gradle-plugin-incubating:test to get the artifacts locally
     antlr4                : '4.5.3',
     cache                 : '2.0.2',
     compiletesting        : '0.15',
@@ -10,26 +10,27 @@ def versions = [
     guava                 : '28.0-jre',
     javaPoet              : '1.9.0',
     jetbrainsAnnotations  : '13.0',
-    junit                 : '4.12',
+    junit                 : '4.13.1',
+    koin                  : '2.1.6',
     kotlin                : '1.4.10',
     kotlinCoroutines      : '1.3.9',
-    kotlinPoet            : '1.5.0',
+    kotlinPoet            : '1.6.0',
     mockito               : '1.9.5',
-    moshi                 : '1.9.2',
-    okHttp4               : '4.5.0',
-    okHttp                : '3.14.9',
-    okio                  : '2.8.0',
-    koin                  : '2.1.6',
+    moshi                 : '1.11.0',
+    okHttp4               : '4.9.0',
+    okHttp                : '3.14.9', // Keep this to keep supporting older Android devices
+    okio                  : '2.9.0',
     retrofit              : '2.9.0',
-    rxjava                : '2.0.5',
-    rxjava3               : '3.0.4',
+    rxjava                : '2.2.20',
+    rxjava3               : '3.0.7',
     rxandroid             : '2.0.1',
-    sqldelight            : '1.4.3',
+    sqldelight            : '1.4.4',
     testRunner            : '0.5',
     truth                 : '0.30'
 ]
 
 ext.isCi = "true" == System.getenv('CI')
+
 ext.dep = [
     android               : [
         plugin    : "com.android.tools.build:gradle:$versions.androidPlugin",

@@ -10,9 +10,9 @@ import java.io.File
 import java.io.InputStream
 
 data class IntrospectionSchema(
-    val queryType: String = "query",
-    val mutationType: String = "mutation",
-    val subscriptionType: String = "subscription",
+    val queryType: String,
+    val mutationType: String?,
+    val subscriptionType: String?,
     val types: Map<String, Type>) : Map<String, IntrospectionSchema.Type> by types {
   sealed class Type(val kind: Kind) {
     abstract val name: String
@@ -115,6 +115,83 @@ data class IntrospectionSchema(
     ENUM, INTERFACE, OBJECT, INPUT_OBJECT, SCALAR, NON_NULL, LIST, UNION
   }
 
+  private fun validate(): IntrospectionSchema {
+    return copy(
+        types = types.mapValues {
+          when (val type = it.value) {
+            is Type.Object -> type.validate()
+            is Type.Enum -> type.validate()
+            is Type.InputObject -> type.validate()
+            else -> type
+          }
+        }
+    )
+  }
+
+  private fun Type.Object.validate() = copy(fields = fields?.map { it.validate() })
+
+  private fun Type.Enum.validate() = copy(enumValues = enumValues.map { it.validate() })
+
+  private fun Type.InputObject.validate() = copy(inputFields = inputFields.map { it.validate() })
+
+  private fun InputField.validate(): InputField {
+    return when {
+      isDeprecated && deprecationReason == null -> {
+        println("InputField '$name' is marked as deprecated but did not provide a reason. Falling back to 'No longer supported'")
+        copy(deprecationReason = "No longuer supported")
+      }
+      !isDeprecated && deprecationReason !== null -> {
+        println("InputField '$name' is marked as not deprecated but provided a reason. Marking as deprecated")
+        copy(isDeprecated = true)
+      }
+      else -> this
+    }
+  }
+
+  private fun Type.Enum.Value.validate(): Type.Enum.Value {
+    return when {
+      isDeprecated && deprecationReason == null -> {
+        println("EnumValue '$name' is marked as deprecated but did not provide a reason. Falling back to 'No longer supported'")
+        copy(deprecationReason = "No longuer supported")
+      }
+      !isDeprecated && deprecationReason !== null -> {
+        println("EnumValue '$name' is marked as not deprecated but provided a reason. Marking as deprecated")
+        copy(isDeprecated = true)
+      }
+      else -> this
+    }
+  }
+
+  private fun Field.validate(): Field {
+    return when {
+      isDeprecated && deprecationReason == null -> {
+        println("Field '$name' is marked as deprecated but did not provide a reason. Falling back to 'No longer supported'")
+        copy(deprecationReason = "No longuer supported")
+      }
+      !isDeprecated && deprecationReason !== null -> {
+        println("Field '$name' is marked as not deprecated but provided a reason. Marking as deprecated")
+        copy(isDeprecated = true)
+      }
+      else -> this
+    }.copy(args = args.map {
+      it.validate()
+    })
+  }
+
+  private fun Field.Argument.validate(): Field.Argument {
+    return when {
+      isDeprecated && deprecationReason == null -> {
+        println("Argument '$name' is marked as deprecated but did not provide a reason. Falling back to 'No longer supported'")
+        copy(deprecationReason = "No longuer supported")
+      }
+      !isDeprecated && deprecationReason !== null -> {
+        println("Argument '$name' is marked as not deprecated but provided a reason. Marking as deprecated")
+        copy(isDeprecated = true)
+      }
+      else -> this
+    }
+  }
+
   companion object {
     private val UTF8_BOM = "EFBBBF".decodeHex()
 
@@ -162,19 +239,19 @@ data class IntrospectionSchema(
 
     fun IntrospectionQuery.Schema.toIntrospectionSchema(): IntrospectionSchema {
       return IntrospectionSchema(
-          queryType = queryType?.name ?: "query",
-          mutationType = mutationType?.name ?: "mutation",
-          subscriptionType = subscriptionType?.name ?: "subscription",
+          queryType = queryType?.name ?: "Query",
+          mutationType = mutationType?.name,
+          subscriptionType = subscriptionType?.name,
           types = types.associateBy { it.name }
-      )
+      ).validate()
     }
 
     fun IntrospectionSchema.wrap(): IntrospectionQuery.Wrapper {
       return IntrospectionQuery.Wrapper(
           __schema = IntrospectionQuery.Schema(
-              queryType = IntrospectionQuery.QueryType(this.queryType),
-              mutationType = IntrospectionQuery.MutationType(this.mutationType),
-              subscriptionType = IntrospectionQuery.SubscriptionType(this.subscriptionType),
+              queryType = this.queryType.let { IntrospectionQuery.QueryType(it) },
+              mutationType = this.mutationType?.let { IntrospectionQuery.MutationType(it) },
+              subscriptionType = this.subscriptionType?.let { IntrospectionQuery.SubscriptionType(it) },
               types = types.values.toList()
           )
       )

@@ -46,7 +46,9 @@ class GraphQLCompiler(val logger: Logger = NoOpLogger) {
 
     val packageNameProvider = DefaultPackageNameProvider(
         roots = roots,
-        rootPackageName = args.rootPackageName
+        rootPackageName = args.rootPackageName,
+        schemaPackageName = schemaPackageName,
+        packageName = args.packageName
     )
 
     val files = args.graphqlFiles
@@ -177,7 +179,7 @@ class GraphQLCompiler(val logger: Logger = NoOpLogger) {
     fieldsToVisit.addAll(this)
     while (fieldsToVisit.isNotEmpty()) {
       val field = fieldsToVisit.removeAt(fieldsToVisit.lastIndex)
-      if (field.isDeprecated) {
+      if (field.deprecationReason != null) {
         deprecatedUsages.add(DeprecatedUsage(filePath, field.sourceLocation, field))
       }
       fieldsToVisit.addAll(field.fields)
@@ -219,7 +221,7 @@ class GraphQLCompiler(val logger: Logger = NoOpLogger) {
     }.forEach {
       val typeSpec = it.toTypeSpec(context.copy())
       JavaFile
-          .builder(context.ir.fragmentsPackageName, typeSpec)
+          .builder(it.packageName, typeSpec)
           .addFileComment(AUTO_GENERATED_FILE)
           .build()
           .writeTo(outputDir)
@@ -403,6 +405,7 @@ class GraphQLCompiler(val logger: Logger = NoOpLogger) {
       val generateAsInternal: Boolean = false,
       val warnOnDeprecatedUsages: Boolean = true,
       val failOnWarnings: Boolean = false,
+      val packageName: String? = null,
 
       //========== Kotlin codegen options ============
 

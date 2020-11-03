@@ -41,9 +41,7 @@ internal object KotlinCodeGen {
   fun deprecatedAnnotation(message: String) = AnnotationSpec
       .builder(Deprecated::class)
       .apply {
-        if (message.isNotBlank()) {
-          addMember("message = %S", message)
-        }
+        addMember("message = %S", message)
       }
       .build()
 
@@ -70,7 +68,7 @@ internal object KotlinCodeGen {
               name = name,
               type = if (isOptional) type.asTypeName().copy(nullable = true) else type.asTypeName()
           )
-          .applyIf(isDeprecated) { addAnnotation(deprecatedAnnotation(deprecationReason)) }
+          .applyIf(deprecationReason != null) { addAnnotation(deprecatedAnnotation(deprecationReason!!)) }
           .applyIf(description.isNotBlank()) { addKdoc("%L\n", description) }
           .initializer(initializer)
           .build()
@@ -399,6 +397,7 @@ internal object KotlinCodeGen {
     }
   }
 
+  // TODO: fix for input object types
   fun Any.toDefaultValueCodeBlock(typeName: TypeName, fieldType: FieldType): CodeBlock = when {
     this is Number -> CodeBlock.of("%L%L", castTo(typeName), if (typeName == LONG) "L" else "")
     fieldType is FieldType.Scalar.Enum -> CodeBlock.of("%T.safeValueOf(%S)", typeName, this)

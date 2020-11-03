@@ -20,6 +20,7 @@ import com.apollographql.apollo.compiler.parser.introspection.IntrospectionSchem
 import com.apollographql.apollo.compiler.parser.introspection.asGraphQLType
 import com.apollographql.apollo.compiler.parser.introspection.isAssignableFrom
 import com.apollographql.apollo.compiler.parser.introspection.possibleTypes
+import com.apollographql.apollo.compiler.parser.introspection.resolveType
 import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.CommonTokenStream
@@ -232,10 +233,12 @@ class GraphQLDocumentParser(
         message = "Unknown variable type `$type`",
         token = type().start
     )
+
     return ParseResult(
         result = Variable(
             name = name,
             type = type,
+            defaultValue = defaultValue()?.value()?.parse(schema.resolveType(type)),
             sourceLocation = SourceLocation(variable().NAME().symbol)
         ),
         usedTypes = setOf(schemaType.name)
@@ -330,8 +333,7 @@ class GraphQLDocumentParser(
               )
             },
             description = schemaField.description?.trim() ?: "",
-            isDeprecated = schemaField.isDeprecated,
-            deprecationReason = schemaField.deprecationReason ?: "",
+            deprecationReason = schemaField.deprecationReason,
             conditions = conditions,
             sourceLocation = SourceLocation(start)
         ),
@@ -359,18 +361,30 @@ class GraphQLDocumentParser(
   private fun GraphQLParser.DirectivesContext?.parse(): List<Condition> {
     return this?.directive()?.mapNotNull { ctx ->
       val name = ctx.NAME().text
-      val argument = ctx.argument()
-      when {
-        argument == null -> null
-        name != "skip" && name != "include" -> null
-        argument.NAME()?.text != "if" || argument.valueOrVariable()?.variable() == null -> null
-        else -> Condition(
-            kind = "BooleanCondition",
-            variableName = argument.valueOrVariable().variable().NAME().text,
-            inverted = ctx.NAME().text == "skip",
-            sourceLocation = SourceLocation(argument.valueOrVariable()?.start ?: argument.NAME().symbol)
-        )
+      val arguments = ctx.arguments()
+
+      if (name != "skip" && name != "include" ) {
+        // we only support skip and include directives for now
+        return@mapNotNull null
       }
+
+      if (arguments.argument().size != 1) {
+        // skip and include should only have a single argument
+        return@mapNotNull null
+      }
+
+      val argument = arguments.argument().first()
+      if (argument.NAME().text != "if" || argument.valueOrVariable().variable() == null) {
+        // The argument should be named "if"
+        // Not 100% why we ignore non-variable arguments
+        return@mapNotNull null
+      }
+      Condition(
+          kind = "BooleanCondition",
+          variableName = argument.valueOrVariable().variable().NAME().text,
+          inverted = name == "skip",
+          sourceLocation = SourceLocation(argument.start)
+      )
     } ?: emptyList()
   }
 
@@ -427,7 +441,7 @@ class GraphQLDocumentParser(
 
     val decoratedParentFields = parentFields.let { (parentFields, usedTypes) ->
       // if inline fragment conditional type contains the same field as parent type
-      // carry over meta info such as: `description`, `isDeprecated`, `deprecationReason`
+      // carry over meta info such as: `description`, `deprecationReason`
       val decoratedFields = parentFields.map { parentField ->
         when (schemaType) {
           is IntrospectionSchema.Type.Interface -> schemaType.fields?.find { it.name == parentField.fieldName }
@@ -437,8 +451,7 @@ class GraphQLDocumentParser(
         }?.let { field ->
           parentField.copy(
               description = field.description ?: parentField.description,
-              isDeprecated = field.isDeprecated,
-              deprecationReason = field.deprecationReason ?: ""
+              deprecationReason = field.deprecationReason
           )
         } ?: parentField
       }
@@ -531,7 +544,8 @@ class GraphQLDocumentParser(
             fragmentRefs = fragmentRefs.union(mergeInlineFragmentRefs).toList(),
             inlineFragments = inlineFragments.result.filter { it.typeCondition != typeCondition },
             filePath = graphQLFilePath,
-            sourceLocation = SourceLocation(start)
+            sourceLocation = SourceLocation(start),
+            packageName = packageNameProvider.fragmentPackageName(graphQLFilePath)
         ),
         usedTypes = setOf(typeCondition)
             .union(fields.usedTypes)
@@ -642,7 +656,10 @@ class GraphQLDocumentParser(
               other.find { otherField ->
                 otherField.responseName + ":" + otherField.fieldName == targetFieldName
               }?.fields ?: emptyList()
-          )
+          ),
+          inlineFragments = targetField.inlineFragments + (other.find { otherField ->
+            otherField.responseName + ":" + otherField.fieldName == targetFieldName
+          }?.inlineFragments ?: emptyList())
       )
     } + other.filter { (it.responseName + ":" + it.fieldName) !in fieldNames }
   }
