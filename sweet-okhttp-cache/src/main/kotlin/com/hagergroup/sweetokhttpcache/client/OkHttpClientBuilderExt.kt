@@ -33,7 +33,7 @@ import java.io.File
  * @author Ludovic Roland
  * @since 2020.09.08
  */
-fun OkHttpClient.Builder.addSweetHttpCache(cachePolicies: Map<String, HttpCachePolicy.Policy>, directory: File, cacheSize: Long = 1024 * 1024): OkHttpClient.Builder {
+fun OkHttpClient.Builder.addSweetOkHttpCache(cachePolicies: Map<String, HttpCachePolicy.Policy>, directory: File, cacheSize: Long = 1024 * 1024): OkHttpClient.Builder {
   addInterceptor(SweetCacheInterceptor(cachePolicies))
   addInterceptor(ApolloHttpCache(DiskLruHttpCacheStore(directory, cacheSize)).interceptor())
 
