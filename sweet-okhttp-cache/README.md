@@ -9,7 +9,7 @@ git remote add upstream https://github.com/apollographql/apollo-android
 
 Then: 
 ```
-git checkout -b main
+git checkout main
 git fetch upstream
 git merge upstream/main
 git reset --hard {tag commit id}
