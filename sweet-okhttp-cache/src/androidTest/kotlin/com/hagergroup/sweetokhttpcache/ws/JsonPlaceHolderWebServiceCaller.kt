@@ -30,8 +30,8 @@ import com.hagergroup.sweetokhttpcache.client.addSweetOkHttpCache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
@@ -185,10 +185,9 @@ object JsonPlaceHolderWebServiceCaller : KoinComponent {
 
   //region clean
   suspend fun cleanUpAll(): Boolean =
-    services.cleanUpAll().code() == 200
+      services.cleanUpAll().code() == 200
 
-  suspend fun cleanUp(cleanTimeout: Long, cleanTimeUnit: TimeUnit): Boolean
-  {
+  suspend fun cleanUp(cleanTimeout: Long, cleanTimeUnit: TimeUnit): Boolean {
     val newTimeout = TimeUnit.MILLISECONDS.convert(cleanTimeout, cleanTimeUnit)
 
     return services.cleanUp(newTimeout).code() == 200
