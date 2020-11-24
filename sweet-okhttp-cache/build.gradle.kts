@@ -21,7 +21,7 @@ android {
   }
 
   defaultConfig {
-    versionName = "2.4.2"
+    versionName = "2.4.5"
 
     minSdkVersion(groovy.util.Eval.x(project, "x.androidConfig.minSdkVersion").toString())
     targetSdkVersion(groovy.util.Eval.x(project, "x.androidConfig.targetSdkVersion").toString())
@@ -36,7 +36,7 @@ android {
 
 dependencies {
   implementation(kotlin("stdlib"))
-  implementation(project(":apollo-http-cache"))
+  add("api", project(":apollo-http-cache"))
 
   add("implementation", groovy.util.Eval.x(project, "x.dep.timber"))
   add("implementation", groovy.util.Eval.x(project, "x.dep.okHttp.okHttp"))
