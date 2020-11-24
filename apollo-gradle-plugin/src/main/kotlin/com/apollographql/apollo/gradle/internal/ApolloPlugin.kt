@@ -1,6 +1,5 @@
 package com.apollographql.apollo.gradle.internal
 
-import com.apollographql.apollo.compiler.ApolloMetadata
 import com.apollographql.apollo.compiler.OperationIdGenerator
 import com.apollographql.apollo.compiler.OperationOutputGenerator
 import com.apollographql.apollo.gradle.api.ApolloAttributes
@@ -259,6 +258,9 @@ open class ApolloPlugin : Plugin<Project> {
         task.group = TASK_GROUP
         task.compilationUnits = apolloExtension.compilationUnits
       }
+      project.tasks.register(ModelNames.pushApolloSchema(), ApolloPushSchemaTask::class.java) { task ->
+        task.group = TASK_GROUP
+      }
     }
 
     fun toMap(s: String): Map<String, String> {
@@ -277,6 +279,9 @@ open class ApolloPlugin : Plugin<Project> {
       registerCompilationUnits(project, apolloExtension, checkVersionsTask)
 
       registerDownloadSchemaTasks(project, apolloExtension)
+      project.tasks.register(ModelNames.convertApolloSchema(), ApolloConvertSchemaTask::class.java) { task ->
+        task.group = TASK_GROUP
+      }
     }
 
     data class Dep(val name: String, val version: String?)

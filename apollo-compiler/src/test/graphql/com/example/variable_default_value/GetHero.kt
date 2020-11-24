@@ -41,9 +41,11 @@ import okio.IOException
 @Suppress("NAME_SHADOWING", "UNUSED_ANONYMOUS_PARAMETER", "LocalVariableName",
     "RemoveExplicitTypeArguments", "NestedLambdaShadowedImplicitParameter")
 data class GetHero(
-  val myBool: Input<Boolean> = Input.optional(true),
-  val unit: LengthUnit = LengthUnit.safeValueOf("FOOT"),
-  val listOfInts: Input<List<Int?>> = Input.optional(listOf(1, 2, 3))
+  val myBool: Input<Boolean> = Input.absent(),
+  val unit: LengthUnit,
+  val listOfInts: Input<List<Int?>> = Input.absent(),
+  val first: Input<Int> = Input.absent(),
+  val optionalUnit: Input<LengthUnit> = Input.absent()
 ) : Query<GetHero.Data, GetHero.Data, Operation.Variables> {
   @Transient
   private val variables: Operation.Variables = object : Operation.Variables() {
@@ -54,6 +56,12 @@ data class GetHero(
       this["unit"] = this@GetHero.unit
       if (this@GetHero.listOfInts.defined) {
         this["listOfInts"] = this@GetHero.listOfInts.value
+      }
+      if (this@GetHero.first.defined) {
+        this["first"] = this@GetHero.first.value
+      }
+      if (this@GetHero.optionalUnit.defined) {
+        this["optionalUnit"] = this@GetHero.optionalUnit.value
       }
     }
 
@@ -70,6 +78,12 @@ data class GetHero(
             }
           }
         })
+      }
+      if (this@GetHero.first.defined) {
+        writer.writeInt("first", this@GetHero.first.value)
+      }
+      if (this@GetHero.optionalUnit.defined) {
+        writer.writeString("optionalUnit", this@GetHero.optionalUnit.value?.rawValue)
       }
     }
   }
@@ -128,6 +142,41 @@ data class GetHero(
   }
 
   /**
+   * A connection object for a character's friends
+   */
+  data class FriendsConnection(
+    val __typename: String = "FriendsConnection",
+    /**
+     * The total number of friends
+     */
+    val totalCount: Int?
+  ) {
+    fun marshaller(): ResponseFieldMarshaller = ResponseFieldMarshaller.invoke { writer ->
+      writer.writeString(RESPONSE_FIELDS[0], this@FriendsConnection.__typename)
+      writer.writeInt(RESPONSE_FIELDS[1], this@FriendsConnection.totalCount)
+    }
+
+    companion object {
+      private val RESPONSE_FIELDS: Array<ResponseField> = arrayOf(
+          ResponseField.forString("__typename", "__typename", null, false, null),
+          ResponseField.forInt("totalCount", "totalCount", null, true, null)
+          )
+
+      operator fun invoke(reader: ResponseReader): FriendsConnection = reader.run {
+        val __typename = readString(RESPONSE_FIELDS[0])!!
+        val totalCount = readInt(RESPONSE_FIELDS[1])
+        FriendsConnection(
+          __typename = __typename,
+          totalCount = totalCount
+        )
+      }
+
+      @Suppress("FunctionName")
+      fun Mapper(): ResponseFieldMapper<FriendsConnection> = ResponseFieldMapper { invoke(it) }
+    }
+  }
+
+  /**
    * A humanoid creature from the Star Wars universe
    */
   data class AsHuman(
@@ -137,14 +186,24 @@ data class GetHero(
      */
     val name: String?,
     /**
+     * The friends of the human exposed as a connection with edges
+     */
+    val friendsConnection: FriendsConnection,
+    /**
      * Height in the preferred unit, default is meters
      */
-    val height: Double?
+    val height: Double?,
+    /**
+     * Height in the preferred unit, default is meters
+     */
+    val heightInMeters: Double?
   ) : HeroCharacter {
     override fun marshaller(): ResponseFieldMarshaller = ResponseFieldMarshaller.invoke { writer ->
       writer.writeString(RESPONSE_FIELDS[0], this@AsHuman.__typename)
       writer.writeString(RESPONSE_FIELDS[1], this@AsHuman.name)
-      writer.writeDouble(RESPONSE_FIELDS[2], this@AsHuman.height)
+      writer.writeObject(RESPONSE_FIELDS[2], this@AsHuman.friendsConnection.marshaller())
+      writer.writeDouble(RESPONSE_FIELDS[3], this@AsHuman.height)
+      writer.writeDouble(RESPONSE_FIELDS[4], this@AsHuman.heightInMeters)
     }
 
     companion object {
@@ -153,25 +212,74 @@ data class GetHero(
           ResponseField.forString("name", "name", null, true, listOf(
             ResponseField.Condition.booleanCondition("myBool", false)
           )),
+          ResponseField.forObject("friendsConnection", "friendsConnection", mapOf<String, Any>(
+            "first" to mapOf<String, Any>(
+              "kind" to "Variable",
+              "variableName" to "first")), false, null),
           ResponseField.forDouble("height", "height", mapOf<String, Any>(
             "unit" to mapOf<String, Any>(
               "kind" to "Variable",
-              "variableName" to "unit")), true, null)
+              "variableName" to "unit")), true, null),
+          ResponseField.forDouble("heightInMeters", "height", mapOf<String, Any>(
+            "unit" to mapOf<String, Any>(
+              "kind" to "Variable",
+              "variableName" to "optionalUnit")), true, null)
           )
 
       operator fun invoke(reader: ResponseReader): AsHuman = reader.run {
         val __typename = readString(RESPONSE_FIELDS[0])!!
         val name = readString(RESPONSE_FIELDS[1])
-        val height = readDouble(RESPONSE_FIELDS[2])
+        val friendsConnection = readObject<FriendsConnection>(RESPONSE_FIELDS[2]) { reader ->
+          FriendsConnection(reader)
+        }!!
+        val height = readDouble(RESPONSE_FIELDS[3])
+        val heightInMeters = readDouble(RESPONSE_FIELDS[4])
         AsHuman(
           __typename = __typename,
           name = name,
-          height = height
+          friendsConnection = friendsConnection,
+          height = height,
+          heightInMeters = heightInMeters
         )
       }
 
       @Suppress("FunctionName")
       fun Mapper(): ResponseFieldMapper<AsHuman> = ResponseFieldMapper { invoke(it) }
+    }
+  }
+
+  /**
+   * A connection object for a character's friends
+   */
+  data class FriendsConnection1(
+    val __typename: String = "FriendsConnection",
+    /**
+     * The total number of friends
+     */
+    val totalCount: Int?
+  ) {
+    fun marshaller(): ResponseFieldMarshaller = ResponseFieldMarshaller.invoke { writer ->
+      writer.writeString(RESPONSE_FIELDS[0], this@FriendsConnection1.__typename)
+      writer.writeInt(RESPONSE_FIELDS[1], this@FriendsConnection1.totalCount)
+    }
+
+    companion object {
+      private val RESPONSE_FIELDS: Array<ResponseField> = arrayOf(
+          ResponseField.forString("__typename", "__typename", null, false, null),
+          ResponseField.forInt("totalCount", "totalCount", null, true, null)
+          )
+
+      operator fun invoke(reader: ResponseReader): FriendsConnection1 = reader.run {
+        val __typename = readString(RESPONSE_FIELDS[0])!!
+        val totalCount = readInt(RESPONSE_FIELDS[1])
+        FriendsConnection1(
+          __typename = __typename,
+          totalCount = totalCount
+        )
+      }
+
+      @Suppress("FunctionName")
+      fun Mapper(): ResponseFieldMapper<FriendsConnection1> = ResponseFieldMapper { invoke(it) }
     }
   }
 
@@ -184,11 +292,16 @@ data class GetHero(
      * The name of the character
      */
     val name: String?,
+    /**
+     * The friends of the character exposed as a connection with edges
+     */
+    val friendsConnection: FriendsConnection1,
     val asHuman: AsHuman?
   ) {
     fun marshaller(): ResponseFieldMarshaller = ResponseFieldMarshaller.invoke { writer ->
       writer.writeString(RESPONSE_FIELDS[0], this@Hero.__typename)
       writer.writeString(RESPONSE_FIELDS[1], this@Hero.name)
+      writer.writeObject(RESPONSE_FIELDS[2], this@Hero.friendsConnection.marshaller())
       writer.writeFragment(this@Hero.asHuman?.marshaller())
     }
 
@@ -198,6 +311,10 @@ data class GetHero(
           ResponseField.forString("name", "name", null, true, listOf(
             ResponseField.Condition.booleanCondition("myBool", false)
           )),
+          ResponseField.forObject("friendsConnection", "friendsConnection", mapOf<String, Any>(
+            "first" to mapOf<String, Any>(
+              "kind" to "Variable",
+              "variableName" to "first")), false, null),
           ResponseField.forFragment("__typename", "__typename", listOf(
             ResponseField.Condition.typeCondition(arrayOf("Human"))
           ))
@@ -206,12 +323,16 @@ data class GetHero(
       operator fun invoke(reader: ResponseReader): Hero = reader.run {
         val __typename = readString(RESPONSE_FIELDS[0])!!
         val name = readString(RESPONSE_FIELDS[1])
-        val asHuman = readFragment<AsHuman>(RESPONSE_FIELDS[2]) { reader ->
+        val friendsConnection = readObject<FriendsConnection1>(RESPONSE_FIELDS[2]) { reader ->
+          FriendsConnection1(reader)
+        }!!
+        val asHuman = readFragment<AsHuman>(RESPONSE_FIELDS[3]) { reader ->
           AsHuman(reader)
         }
         Hero(
           __typename = __typename,
           name = name,
+          friendsConnection = friendsConnection,
           asHuman = asHuman
         )
       }
@@ -297,16 +418,21 @@ data class GetHero(
 
   companion object {
     const val OPERATION_ID: String =
-        "174c448da54ce10fe5ade777417fe38dcbc242e68cd54f905a7c6e465e02fdf1"
+        "8072e53b9ff2579729b1fd0f06fe483b630c8c1e8a81c06f347a2f25bac675df"
 
     val QUERY_DOCUMENT: String = QueryDocumentMinifier.minify(
           """
-          |query GetHero(${'$'}myBool: Boolean = true, ${'$'}unit: LengthUnit! = FOOT, ${'$'}listOfInts: [Int] = [1, 2, 3]) {
+          |query GetHero(${'$'}myBool: Boolean = true, ${'$'}unit: LengthUnit! = FOOT, ${'$'}listOfInts: [Int] = [1, 2, 3], ${'$'}first: Int = null, ${'$'}optionalUnit: LengthUnit = METER) {
           |  hero {
           |    __typename
           |    name @include(if: ${'$'}myBool)
           |    ... on Human {
           |      height(unit: ${'$'}unit)
+          |      heightInMeters: height(unit: ${'$'}optionalUnit)
+          |    }
+          |    friendsConnection(first: ${'$'}first) {
+          |      __typename
+          |      totalCount
           |    }
           |  }
           |  heroWithReview(listOfInts: ${'$'}listOfInts) {
