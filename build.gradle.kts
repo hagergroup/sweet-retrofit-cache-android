@@ -53,6 +53,7 @@ subprojects {
 
   repositories {
     google()
+    jcenter()
     mavenCentral()
     jcenter {
       content {
