@@ -55,11 +55,6 @@ subprojects {
     google()
     jcenter()
     mavenCentral()
-    jcenter {
-      content {
-        includeGroup("org.jetbrains.trove4j")
-      }
-    }
   }
 
   group = property("GROUP")!!
