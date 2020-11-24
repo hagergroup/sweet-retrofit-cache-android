@@ -30,6 +30,7 @@ import com.hagergroup.sweetokhttpcache.client.addSweetOkHttpCache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.Retrofit
@@ -40,6 +41,7 @@ import java.util.concurrent.TimeUnit
  * @author Ludovic Roland
  * @since 2020.09.08
  */
+@KoinApiExtension
 object JsonPlaceHolderWebServiceCaller : KoinComponent {
 
   private val context: Context by inject()
